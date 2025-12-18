@@ -2,7 +2,7 @@
 
 This repository contains the source code for my personal website.
 
-**Website:** https://visorbearer.github.io
+**Website:** https://visorbearer.github.io / https://masonmaron.com
 
 ## Structure
 ```
