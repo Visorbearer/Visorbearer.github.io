@@ -18,6 +18,7 @@ Visorbearer.github.io/
 │   ├── hero.jpg
 │   ├── hero-mobile.jpg
 │   ├── about.jpg
+│   └── og.jpg
 ├── style.css
 ├── main.js
 └── CNAME
