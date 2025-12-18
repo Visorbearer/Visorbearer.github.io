@@ -1,0 +1,113 @@
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #fafafa;
+  color: #222;
+}
+
+.navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.nav-container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+nav a {
+  margin-left: 1.5rem;
+  text-decoration: none;
+  color: #555;
+  font-weight: 500;
+}
+
+nav a:hover {
+  color: #000;
+}
+
+nav a.active {
+  color: #000;
+  border-bottom: 2px solid #000;
+  padding-bottom: 2px;
+}
+
+.content {
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 0 1rem;
+}
+
+.hero {
+  position: relative;
+  height: 60vh;
+  background-image: url("images/hero.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  color: white;
+  text-align: center;
+}
+
+.hero-overlay h1 {
+  font-size: 3rem;
+  margin: 0;
+}
+
+.hero-overlay p {
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+/* PRESS */
+.press-item {
+  margin-bottom: 1.5rem;
+}
+
+.press-item h3 {
+  margin: 0;
+}
+
+.press-item p {
+  margin: 0.3rem 0;
+  color: #444;
+}
+
+.press-item span {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.about-photo {
+  float: right;
+  width: 220px;
+  margin: 0 0 1rem 1.5rem;
+  border-radius: 5px;
+}
+
+@media (max-width: 600px) {
+  .about-photo {
+    float: none;
+    display: block;
+    margin: 0 auto 1.5rem auto;
+    width: 60%;
+  }
+}

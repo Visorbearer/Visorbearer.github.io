@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CV – Mason Maron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+<header class="navbar">
+  <div id="navbar"></div>
+</header>
+
+<main class="content">
+
+  <p>
+    <a href="ResearchCV.pdf" target="_blank">Download PDF</a>
+  </p>
+
+  <section id="cv-content"></section>
+
+</main>
+
+<script>
+fetch("ResearchCV.md")
+  .then(res => res.text())
+  .then(md => {
+    document.getElementById("cv-content").innerHTML = marked.parse(md);
+  });
+</script>
+
+<script src="main.js"></script>
+</body>
+</html>
