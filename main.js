@@ -44,13 +44,15 @@ const press = [
 
 const pressList = document.getElementById("press-list");
 
-press.forEach(item => {
-  const div = document.createElement("div");
-  div.className = "press-item";
-  div.innerHTML = `
-    <h3><a href="${item.url}" target="_blank">${item.title}</a></h3>
-    <p>${item.excerpt}</p>
-    <span>${item.date}</span>
-  `;
-  pressList.appendChild(div);
-});
+if (pressList) {
+  press.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "press-item";
+    div.innerHTML = `
+      <h3><a href="${item.url}" target="_blank">${item.title}</a></h3>
+      <p>${item.excerpt}</p>
+      <span>${item.date}</span>
+    `;
+    pressList.appendChild(div);
+  });
+}

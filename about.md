@@ -1,4 +1,4 @@
-<img src="images/about.jpg" class="about-photo" alt="Mason Maron">
+<img src="images/about.JPG" class="about-photo" alt="Mason Maron">
 
 I'm a graduate student at the University of Illinois Urbana Champaign in the **[Migration Biology Lab](https://www.migrationbiology.org/)**. I use cutting-edge tools like fine-scale radar, bioacoustics, and thermal imaging to explore the social and spatial components of nocturnal migration. I'm especially interested in understanding the function of nocturnal flight calls, inter- and intraspecific interactions in migration, and how human landscapes impact migratory behavior. In this, I hope to connect individual behavior to large-scale migration patterns and expand our knowledge of migration while improving how we study it.
 
