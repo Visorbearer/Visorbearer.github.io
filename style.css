@@ -116,3 +116,22 @@ nav a.active {
   line-height: 1.7;
 }
 
+.publication {
+  display: flex;
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.publication h3 {
+  margin: 0;
+}
+
+.pub-text p {
+  margin: 0.4rem 0 0;
+  color: #444;
+}
+
+.altmetric-embed {
+  flex-shrink: 0;
+}
+
