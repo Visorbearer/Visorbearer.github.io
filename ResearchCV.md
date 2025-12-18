@@ -6,13 +6,13 @@ Master's Student, University of Illinois Urbana-Champaign\
 
 ---
 
-**2019-2023** B.S., Earth and Environmental Science, School of the
-Environment, Washington State University Magna Cum Laude, Major in
-Wildlife Ecology and Conservation Sciences and Minor in Forestry
-
 **2025-Present** M.S., Natural Resources and Environmental Sciences, College
 of Agricultural, Consumer and Environmental Sciences, University of
 Illinois Urbana-Champaign
+
+**2019-2023** B.S., Earth and Environmental Science, School of the
+Environment, Washington State University Magna Cum Laude, Major in
+Wildlife Ecology and Conservation Sciences and Minor in Forestry
 
 ## Publications
 
