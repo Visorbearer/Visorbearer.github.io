@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
   background-color: #fafafa;
   color: #222;
 }
@@ -68,12 +68,14 @@ nav a.active {
 }
 
 .hero-overlay h1 {
-  font-size: clamp(3rem, 6vw, 4.5rem);
+  font-size: clamp(4rem, 8vw, 6rem);
   font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
 .hero-overlay p {
-  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  margin-top: 0.75rem;
   opacity: 0.95;
 }
 
@@ -111,9 +113,9 @@ nav a.active {
   }
 }
 
-#about {
-  font-size: 1.12rem;
-  line-height: 1.7;
+#about p {
+  font-size: 1.25rem;
+  line-height: 1.85;
 }
 
 .publication {
@@ -133,5 +135,15 @@ nav a.active {
 
 .altmetric-embed {
   flex-shrink: 0;
+}
+
+a {
+  color: #6886b3;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #4a6fa5;
+  text-decoration: underline;
 }
 
