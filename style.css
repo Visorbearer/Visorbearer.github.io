@@ -86,7 +86,8 @@ nav a.active {
 
 @media (max-width: 600px) {
   .hero {
-    background-position: 50% 28%;
+    background-image: url("images/hero-mobile.jpg");
+    background-position: center;
   }
   
   .hero-overlay h1 {
