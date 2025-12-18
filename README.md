@@ -21,6 +21,6 @@ Visorbearer.github.io/
 └── main.js
 ```
 
-## Notes
-This site is hosted via GitHub Pages. Please feel free to adapt any code for your own use, but do not retain
-personal information specific to me! I'm sure displaying your own CV is better than displaying mine :)
+## Reuse Note
+Please feel free to adapt any code for your own use, but do not retain personal information 
+specific to me! I'm sure displaying your own CV is better than displaying mine :)
