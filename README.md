@@ -16,6 +16,7 @@ Visorbearer.github.io/
 ├── research.html       # HTML renderer for publications list
 ├── images/
 │   ├── hero.jpg
+│   ├── hero-mobile.jpg
 │   ├── about.jpg
 ├── style.css
 ├── main.js
