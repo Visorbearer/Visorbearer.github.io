@@ -141,7 +141,7 @@ nav a.active {
 .publication {
   display: grid;
   grid-template-columns: 48px 1fr;
-  column-gap: 1.75rem;
+  column-gap: 2.2rem;
   margin-bottom: 2rem;
   align-items: start;
   list-style-type: decimal;
