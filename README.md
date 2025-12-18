@@ -18,7 +18,8 @@ Visorbearer.github.io/
 │   ├── hero.jpg
 │   ├── about.jpg
 ├── style.css
-└── main.js
+├── main.js
+└── CNAME
 ```
 
 ## Reuse Note
