@@ -18,34 +18,34 @@ Wildlife Ecology and Conservation Sciences and Minor in Forestry
 
 ---
 
-**Maron, M. W.**, N. Paprocki, J. P. Owen, & C. J. Conway. (2024).
-Differential Effects of Chewing Lice on Body Condition Across Host Age
-and Sex in Rough-legged Hawks (*Buteo lagopus*). Journal of Wildlife
-Diseases 60(4): 991-995. DOI: [10.7589/JWD-D-24-00013](https://doi.org/10.7589/JWD-D-24-00013)
+**Maron, M. W.** et al. Revision of the *Craspedorrhynchus dilatatus* Complex 
+with Two New Species from *Buteo* Hawks. Zootaxa (*In Preparation*).
+
+Mahon, C. & **M. W. Maron**. Spring Photoperiod Aligns Migration in Common 
+Poorwill (*Phalaenoptilus nuttallii*) with Prey Insect Emergence. Ornithology 
+(*In Preparation*).
+
+**Maron, M. W.** et al. (2025). Lesser Goldfinch (*Spinus psaltria*), version 2.0. 
+Birds of the World. Cornell Lab of Ornithology, Ithaca, NY, USA. DOI: [10.2173/bow.lesgol.02](https://birdsoftheworld.org/bow/species/lesgol) 
+
+**Maron, M. W.** (2025). Behavioral observations of Lesser Goldfinches in 
+Pullman, Washington. Western Birds 56(4):302-303. DOI: [10.21199/wb56.4.6](https://westernfieldornithologists.org/publications/journal/journal-volume-56-4/behavioral_observations_of_lesser_goldfinches_in_pullman-washington/) 
+
+**Maron, M. W.** (2025). PFW: Filtering and Processing Data from Project FeederWatch. 
+DOI: [10.32614/CRAN.package.PFW](https://cran.r-project.org/web/packages/PFW/index.html) 
+
+**Maron, M. W.**, E. I. Greig, & J. Boersma. (2025). Climate and Landscape 
+Modification Facilitate Range Expansion in *Spinus psaltria* (Lesser Goldfinch) 
+across the Pacific Northwest. Ornithology ukaf013. DOI: [10.1093/ornithology/ukaf013](https://doi.org/10.1093/ornithology/ukaf013) 
 
 **Maron, M. W.** & C. Borre. (2024). First Record of Breeding Behavior by 
 Chestnut-sided Warbler in Washington. Western Birds 55(2): 137-142. 
 DOI: [10.21199/WB55.2.5](https://westernfieldornithologists.org/publications/journal/journal-volume-55-2/first_record_of_breeding_behavior_by_the_chestnut-sided_warbler_in_washington/) 
 
-**Maron, M. W.**, E. I. Greig, & J. Boersma. (2025). Climate and Landscape 
-Modification Facilitate Range Expansion in *Spinus psaltria* (Lesser Goldfinch) 
-across the Pacific Northwest. Ornithology ukaf013. DOI: [10.1093/ornithology/ukaf013](https://doi.org/10.1093/ornithology/ukaf013) 
- 
-**Maron, M. W.** (2025). PFW: Filtering and Processing Data from Project FeederWatch. 
-DOI: [10.32614/CRAN.package.PFW](https://cran.r-project.org/web/packages/PFW/index.html) 
-
-**Maron, M. W.** (2025). Behavioral observations of Lesser Goldfinches in 
-Pullman, Washington. Western Birds 56(4):302-303. DOI: [10.21199/wb56.4.6](https://westernfieldornithologists.org/publications/journal/journal-volume-56-4/behavioral_observations_of_lesser_goldfinches_in_pullman-washington/) 
-
-**Maron, M. W.** et al. (2025). Lesser Goldfinch (*Spinus psaltria*), version 2.0. 
-Birds of the World. Cornell Lab of Ornithology, Ithaca, NY, USA. DOI: [10.2173/bow.lesgol.02](https://birdsoftheworld.org/bow/species/lesgol) 
-
-**Maron, M. W.** et al. Revision of the *Craspedorrhynchus dilatatus* Complex 
-with Two New Species from *Buteo* Hawks. Zootaxa (*In Preparation*). 
-
-Mahon, C. & **M. W. Maron**. Spring Photoperiod Aligns Migration in Common 
-Poorwill (*Phalaenoptilus nuttallii*) with Prey Insect Emergence. Ornithology 
-(*In Preparation*).
+**Maron, M. W.**, N. Paprocki, J. P. Owen, & C. J. Conway. (2024).
+Differential Effects of Chewing Lice on Body Condition Across Host Age
+and Sex in Rough-legged Hawks (*Buteo lagopus*). Journal of Wildlife
+Diseases 60(4): 991-995. DOI: [10.7589/JWD-D-24-00013](https://doi.org/10.7589/JWD-D-24-00013)
 
 ## Grants and Awards
 
