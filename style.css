@@ -71,11 +71,14 @@ nav a.active {
   font-size: clamp(4rem, 8vw, 6rem);
   font-weight: 600;
   letter-spacing: -0.025em;
+  margin-bottom: 0.2em;
+  line-height: 1.05;
 }
 
 .hero-overlay p {
   font-size: clamp(1.6rem, 3vw, 2.2rem);
-  margin-top: 0.75rem;
+  margin-top: 0;
+  line-height: 1.1;
   opacity: 0.95;
 }
 
@@ -99,12 +102,12 @@ nav a.active {
 
 .about-photo {
   float: right;
-  width: 220px;
+  width: 440px;
   margin: 0 0 1rem 1.5rem;
   border-radius: 5px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 800px) {
   .about-photo {
     float: none;
     display: block;
