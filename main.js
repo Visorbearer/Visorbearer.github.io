@@ -33,7 +33,7 @@ const press = [
     url: "https://www.allaboutbirds.org/news/bigger-range-lesser-goldfinch/",
     excerpt: "Researchers from Washington State University and the Cornell Lab of Ornithology analyzed bird-observation data from two participatory-science initiatives from the Cornell Lab—Project FeederWatch and eBird—to track Lesser Goldfinch range changes over the past 25 years. The study, published in the journal Ornithology in April, shows that Lesser Goldfinch year-round populations more than doubled in size in Washington State, while also increasing substantially in Idaho and Oregon...",
     date: "2025-06-27"
-  }
+  },
   {
     title: "A Bug’s Life Under Rough-legged Hawk Feathers",
     url: "http://wos.org/documents/wosnews/wosnews203.pdf",
