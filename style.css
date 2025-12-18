@@ -73,7 +73,7 @@ nav a.active {
   letter-spacing: -0.02em;
   margin-bottom: 0.2em;
   line-height: 1.05;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
 }
 
 .hero-overlay p {
@@ -81,7 +81,17 @@ nav a.active {
   margin-top: 0;
   line-height: 1.15;
   opacity: 0.95;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 600px) {
+  .hero-overlay h1 {
+    font-size: clamp(2.6rem, 8vw, 3.4rem);
+  }
+
+  .hero-overlay p {
+    font-size: clamp(1.05rem, 3.5vw, 1.3rem);
+  }
 }
 
 .press-item {
