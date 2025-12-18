@@ -121,14 +121,30 @@ nav a.active {
   line-height: 1.85;
 }
 
+.publications {
+  padding-left: 2.5rem;
+}
+
 .publication {
-  display: flex;
-  gap: 1.2rem;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  column-gap: 1.2rem;
   margin-bottom: 2rem;
+  align-items: start;
+}
+
+.publication .altmetric-embed {
+  width: 48px;
+  min-height: 48px;
 }
 
 .publication h3 {
   margin: 0;
+}
+
+.pub-text {
+  font-size: 1.1rem;
+  line-height: 1.65;
 }
 
 .pub-text p {
@@ -136,8 +152,9 @@ nav a.active {
   color: #444;
 }
 
-.altmetric-embed {
-  flex-shrink: 0;
+.publication::marker {
+  font-size: 1rem;
+  color: #777;
 }
 
 a {
