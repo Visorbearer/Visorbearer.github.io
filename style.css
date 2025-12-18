@@ -85,6 +85,10 @@ nav a.active {
 }
 
 @media (max-width: 600px) {
+  .hero {
+    background-position: 50% 28%;
+  }
+  
   .hero-overlay h1 {
     font-size: clamp(2.6rem, 8vw, 3.4rem);
   }
