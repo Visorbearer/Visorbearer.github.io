@@ -104,7 +104,7 @@ nav a.active {
 
 .about-photo {
   float: right;
-  width: 440px;
+  width: 340px;
   margin: 0 0 1rem 1.5rem;
   border-radius: 5px;
 }
@@ -124,15 +124,17 @@ nav a.active {
 }
 
 .publications {
-  padding-left: 2.5rem;
+  padding-left: 0;
+  list-style-position: inside;
 }
 
 .publication {
   display: grid;
   grid-template-columns: 48px 1fr;
-  column-gap: 1.2rem;
+  column-gap: 1.75rem;
   margin-bottom: 2rem;
   align-items: start;
+  list-style-type: decimal;
 }
 
 .publication .altmetric-embed {
