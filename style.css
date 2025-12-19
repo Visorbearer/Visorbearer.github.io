@@ -43,11 +43,10 @@ nav a.active {
 
 .nav-toggle {
   display: none;
-  font-size: 1.6rem;
   background: none;
   border: none;
+  font-size: 1.6rem;
   cursor: pointer;
-  color: #222;
 }
 
 @media (max-width: 768px) {
@@ -56,28 +55,24 @@ nav a.active {
   }
 
   .nav-links {
-    display: none;
     position: absolute;
     top: 100%;
-    right: 1rem;
+    right: 0;
+
     background: white;
     border: 1px solid #e5e5e5;
     border-radius: 6px;
-    padding: 0.5rem 0;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+
+    display: none;
     flex-direction: column;
     min-width: 220px;
+    padding: 0.5rem 0;
     z-index: 1000;
   }
 
   .nav-links a {
+    padding: 0.75rem 1rem;
     margin: 0;
-    padding: 0.6rem 1rem;
-    display: block;
-  }
-
-  .nav-links a:hover {
-    background: #f5f5f5;
   }
 
   .nav-links.open {
