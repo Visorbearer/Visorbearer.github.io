@@ -52,20 +52,27 @@ nav a.active {
 }
 
 @media (max-width: 768px) {
+  .nav-container {
+    flex-wrap: wrap;
+  }
+
+  .nav-toggle {
+    display: block;
+  }
+
   .nav-links {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
+    position: static;
+    width: 100%;
+    order: 3;
 
     background: white;
-    padding: 1rem 0;
+    padding: 0.5rem 0;
 
     display: none;
     flex-direction: column;
     text-align: center;
 
-    border-bottom: 1px solid #e5e5e5;
+    border-top: 1px solid #e5e5e5;
   }
 
   .nav-links.open {
