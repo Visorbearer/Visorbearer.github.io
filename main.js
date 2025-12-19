@@ -18,21 +18,24 @@ fetch("navbar.html")
         link.classList.add("active");
       }
     });
+
+    // Hamburger menu on mobile
+    const toggle = document.querySelector(".nav-toggle");
+    const nav = document.querySelector(".nav-links");
+
+    if (toggle && nav) {
+      toggle.addEventListener("click", () => {
+        nav.classList.toggle("open");
+      });
+
+      // close menu when tapping a link on mobile
+      nav.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", () => {
+          nav.classList.remove("open");
+        });
+      });
+    }
   });
-
-// Hamburger menu navbar on mobile
-document.addEventListener("click", (e) => {
-  const toggle = document.querySelector(".nav-toggle");
-  const nav = document.querySelector(".nav-links");
-
-  if (!toggle || !nav) return;
-
-  if (toggle.contains(e.target)) {
-    nav.classList.toggle("open");
-  } else {
-    nav.classList.remove("open");
-  }
-});
 
 // Featured press
 const press = [
