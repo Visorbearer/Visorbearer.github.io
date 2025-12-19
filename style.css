@@ -6,8 +6,10 @@ body {
 }
 
 .navbar {
+  position: relative;
   background-color: #ffffff;
   border-bottom: 1px solid #e5e5e5;
+  z-index: 1000;
 }
 
 .nav-container {
@@ -50,33 +52,29 @@ nav a.active {
 }
 
 @media (max-width: 768px) {
-  .nav-toggle {
-    display: block;
-  }
-
   .nav-links {
     position: absolute;
     top: 100%;
+    left: 0;
     right: 0;
 
     background: white;
-    border: 1px solid #e5e5e5;
-    border-radius: 6px;
+    padding: 1rem 0;
 
     display: none;
     flex-direction: column;
-    min-width: 220px;
-    padding: 0.5rem 0;
-    z-index: 1000;
-  }
+    text-align: center;
 
-  .nav-links a {
-    padding: 0.75rem 1rem;
-    margin: 0;
+    border-bottom: 1px solid #e5e5e5;
   }
 
   .nav-links.open {
     display: flex;
+  }
+
+  .nav-links a {
+    padding: 0.75rem 0;
+    margin: 0;
   }
 }
 
