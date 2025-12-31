@@ -200,7 +200,7 @@ nav a.active {
 }
 
 @media (max-width: 768px) {
-  .egg {
+  .easter-egg {
     position: static;
     display: inline-block;
     margin-top: 2rem;
