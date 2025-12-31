@@ -79,3 +79,11 @@ if (pressList) {
     pressList.appendChild(div);
   });
 }
+
+// Shh... it's an easter egg
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("easter-egg")) {
+    alert("You found the Easter egg!");
+  }
+});
+
