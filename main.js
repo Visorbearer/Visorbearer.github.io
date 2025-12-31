@@ -42,7 +42,7 @@ const press = [
     {
     title: "Bird never seen before in Canada draws crowds to Vancouver park",
     url: "https://globalnews.ca/news/11592512/rare-bird-vancouver-taiga-flycatcher/",
-    excerpt: "Maron said with the bird now in Canada, he expects it to 'hang out' for a while, but will likely end up somewhere else should a storm or other weather system push him out from B.C. As to where exactly it will go, Maron said he can’t be sure.",
+    excerpt: "'Maron said with the bird now in Canada, he expects it to 'hang out' for a while, but will likely end up somewhere else should a storm or other weather system push him out from B.C. As to where exactly it will go, Maron said he can’t be sure.'",
     date: "2025-12-28"
   },
   {
