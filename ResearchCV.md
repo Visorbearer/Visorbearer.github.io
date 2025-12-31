@@ -106,6 +106,9 @@ Tulalip, WA.
 
 ### Interviews
 
+**2025** Bird never seen before in Canada draws crowds to Vancouver park, 
+*Global News*
+
 **2025** Why a new type of bird is making its presence felt in the Pacific
 Northwest, *Columbia Insight*
 
