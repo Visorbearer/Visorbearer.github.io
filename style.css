@@ -199,6 +199,14 @@ nav a.active {
   transform: scale(1.2);
 }
 
+@media (max-width: 768px) {
+  .egg {
+    position: static;
+    display: inline-block;
+    margin-top: 2rem;
+  }
+}
+
 .publications {
   padding-left: 0;
   list-style-position: inside;
