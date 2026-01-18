@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Mason Maron
 Master's Student, University of Illinois Urbana-Champaign\
 [*mwmaron2@illinois.edu*](mailto:mwmaron2@illinois.edu)
@@ -17,13 +22,6 @@ Wildlife Ecology and Conservation Sciences and Minor in Forestry
 ## Publications
 
 ---
-
-**Maron, M. W.** et al. Revision of the *Craspedorrhynchus dilatatus* Complex 
-with Two New Species from *Buteo* Hawks. Zootaxa (*In Preparation*).
-
-Mahon, C. & **M. W. Maron**. Spring Photoperiod Aligns Migration in Common 
-Poorwill (*Phalaenoptilus nuttallii*) with Prey Insect Emergence. Ornithology 
-(*In Preparation*).
 
 **Maron, M. W.** et al. (2025). Lesser Goldfinch (*Spinus psaltria*), version 2.0. 
 Birds of the World. Cornell Lab of Ornithology, Ithaca, NY, USA. DOI: [10.2173/bow.lesgol.02](https://birdsoftheworld.org/bow/species/lesgol) 
