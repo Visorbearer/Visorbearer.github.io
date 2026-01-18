@@ -1,8 +1,3 @@
----
-output:
-  pdf_document: default
-  html_document: default
----
 # Mason Maron
 Master's Student, University of Illinois Urbana-Champaign\
 [*mwmaron2@illinois.edu*](mailto:mwmaron2@illinois.edu)
