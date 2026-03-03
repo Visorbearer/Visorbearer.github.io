@@ -14,6 +14,12 @@ Illinois Urbana-Champaign
 Environment, Washington State University Magna Cum Laude, Major in
 Wildlife Ecology and Conservation Sciences and Minor in Forestry
 
+### Teaching Experience
+
+**2026** Teaching Assistant, Wildlife Population Ecology (University of Illinois Urbana-Champaign)
+
+**2021** Teaching Assistant, Natural Resource Ecology (Washington State University)
+
 ## Publications
 
 ---
