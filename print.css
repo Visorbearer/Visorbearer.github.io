@@ -1,0 +1,33 @@
+/* Hide navigation and UI elements */
+.navbar,
+.nav-toggle {
+  display: none !important;
+}
+
+/* Remove extra page margins */
+body {
+  margin: 0;
+  background: white;
+}
+
+/* Make CV content fill the page nicely */
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Prevent awkward page breaks */
+h1, h2, h3 {
+  page-break-after: avoid;
+}
+
+p, li {
+  page-break-inside: avoid;
+}
+
+/* Ensure links print clearly */
+a {
+  color: black;
+  text-decoration: none;
+}
