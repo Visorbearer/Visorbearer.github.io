@@ -73,31 +73,35 @@ Fund Award (*$2,500*)
 
 ### Oral
 
-**2025** Maron, M. W. How the West was Won... by Lesser Goldfinch: Climate
+**2026** Tennenbaum, K., Becker, I., __Maron, M. W.__, & Contina, A. A deep learning 
+model for avian bioacoustics requires region-specific training. The Society for 
+Integrative & Comparative Biology Annual Meeting, Portland, OR. *Non-speaking Contributor.*
+
+**2025** __Maron, M. W.__ How the West was Won... by Lesser Goldfinch: Climate
 and landscape factors driving goldfinch range expansion across the
 Pacific Northwest. Pendleton Bird Club, Pendleton, OR, Virtual. *Invited.*
 
-**2025** Maron, M. W. Invasion of the Thistle Snatchers: how Lesser Goldfinch has
+**2025** __Maron, M. W.__ Invasion of the Thistle Snatchers: how Lesser Goldfinch has
 Rapidly Expanded Across the Pacific Northwest. Western Field
 Ornithologists - Washington Ornithological Society Joint Conference,
 Yakima, WA. 
 
-**2025** Maron, M. W. Birding and Photography. Birds Connect Seattle, 
+**2025** __Maron, M. W__. Birding and Photography. Birds Connect Seattle, 
 Seattle, WA, Virtual. *Invited.*
 
-**2022** Maron, M. W. Birds and Habitats of Southern Patagonia. 
+**2022** __Maron, M. W.__ Birds and Habitats of Southern Patagonia. 
 Spokane Audubon Society, Spokane, WA, Virtual. *Invited.*
 
-**2022** Maron, M. W. An analysis of the representative accuracy of citizen
+**2022** __Maron, M. W.__ An analysis of the representative accuracy of citizen
 science data on expected avian species in southern Chilean Patagonia.
 School for Field Studies Chile, Puerto Natales, Magallanes, Chile.
 
 ### Poster
 
-**2025** Maron, M. W., Greig, E. I., & Boersma, J. Climate and Landscape
+**2025** __Maron, M. W.__, Greig, E. I., & Boersma, J. Climate and Landscape
 Modification Drive Range Expansion in Lesser Goldfinch across the
 Pacific Northwest. Washington Chapter of the Wildlife Society Meeting,
-Tulalip, WA.
+Tulalip, WA. Abstract DOI: (10.1898/NWN2025_Abstracts_Publish)[https://doi.org/10.1898/NWN2025_Abstracts_Publish]
 
 ## Popular Press
 
