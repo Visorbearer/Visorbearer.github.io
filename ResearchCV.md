@@ -52,6 +52,8 @@ Diseases 60(4): 991-995. DOI: [10.7589/JWD-D-24-00013](https://doi.org/10.7589/J
 
 ### Grants
 
+**2026** NSF Graduate Research Fellowship Awardee
+
 **2025** Texas Ornithological Society Research Grant (*$1,900*) 
 
 **2025** NSF Graduate Research Fellowship Program (*Honorable Mention*)
