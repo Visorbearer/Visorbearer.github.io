@@ -107,7 +107,7 @@ School for Field Studies Chile, Puerto Natales, Magallanes, Chile.
 **2025** __Maron, M. W.__, Greig, E. I., & Boersma, J. Climate and Landscape
 Modification Drive Range Expansion in Lesser Goldfinch across the
 Pacific Northwest. Washington Chapter of the Wildlife Society Meeting,
-Tulalip, WA. Abstract DOI: (10.1898/NWN2025_Abstracts_Publish)[https://doi.org/10.1898/NWN2025_Abstracts_Publish]
+Tulalip, WA. Abstract DOI: [10.1898/NWN2025_Abstracts_Publish](https://doi.org/10.1898/NWN2025_Abstracts_Publish)
 
 ## Popular Press
 
