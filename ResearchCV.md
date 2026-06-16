@@ -52,6 +52,8 @@ Diseases 60(4): 991-995. DOI: [10.7589/JWD-D-24-00013](https://doi.org/10.7589/J
 
 ### Grants
 
+**2026** NRES Knoebel International Travel Grant (*$500*)
+
 **2026**  American Ornithological Society Travel Grant (*$700*)
 
 **2026** NSF Graduate Research Fellow (*$159,000*)
