@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Birdoku</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <main class="page">
+    <header class="birdoku-header">
+      <div class="birdoku-logo-placeholder">🐦</div>
+      <div>
+        <div class="birdoku-title">Birdoku</div>
+        <div class="birdoku-subtitle">A daily "sudoku-like" puzzle for birders!</div>
+      </div>
+    </header>
+
+    <div class="section-title">Today's Puzzle</div>
+
+    <div id="loading">Loading today’s Birdoku...</div>
+    <div id="game"></div>
+    <div id="actions"></div>
+    <div id="result"></div>
+
+    <footer class="footer">
+      <p>
+        Birdoku is a bird puzzle game built by
+        <a href="https://masonmaron.com/" target="_blank">Mason Maron</a>
+        and inspired by
+        <a href="https://pokedoku.com/" target="_blank">PokeDoku</a>.
+        Species trait data comes from
+        <a href="https://doi.org/10.1038/s41597-025-05615-3" target="_blank">BIRDBASE</a>,
+        but this project is not affiliated with BIRDBASE or its creators in any way.
+        Any errors in gameplay categories may reflect either data limitations or developer implementation choices.
+        This game is still in development and may contain bugs or incomplete features. Thanks for checking it out!
+      </p>
+    </footer>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
