@@ -1,0 +1,1 @@
+This folder contains all the answers to all past Birdokus! Don't look at them if you don't want spoilers!
