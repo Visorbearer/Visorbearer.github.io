@@ -603,8 +603,8 @@ function renderLocalStats() {
     stats.averageScore === null ? "-" : stats.averageScore.toFixed(1);
 
   statsEl.innerHTML = `
-    <span title="Current Streak">🔥 ${stats.currentStreak}</span>
-    <span title="Best Streak">🏆 ${stats.bestStreak}</span>
+    <span title="Current Streak"> Current Streak:  ${stats.currentStreak}</span>
+    <span title="Best Streak"> Best Streak: ${stats.bestStreak}</span>
     <span title="Total Birdoku Completed">Played: ${stats.played}</span>
   `;
 
