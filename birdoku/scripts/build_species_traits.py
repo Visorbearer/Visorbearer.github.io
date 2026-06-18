@@ -128,6 +128,45 @@ def actual_values_for_group(species_id, category, subcat):
 
     return actual_values
 
+def raw_value_to_user_label(category, subcat, raw_value):
+    """
+    Translate raw coded values into display labels using value_translator.
+    Example: Nest Type / Nest_Type / PL -> Platform
+    """
+
+    if pd.isna(raw_value):
+        return None
+
+    raw_value = str(raw_value).strip()
+
+    if not raw_value:
+        return None
+
+    possible_rows = value_translator[
+        (value_translator["category"].astype(str).str.strip() == str(category).strip()) &
+        (value_translator["subcategory_code"].astype(str).str.strip() == str(subcat).strip())
+    ]
+
+    labels = []
+
+    for _, translator_row in possible_rows.iterrows():
+        allowed_values = [
+            value.strip()
+            for value in str(translator_row["value"]).split("|")
+        ]
+
+        if raw_value in allowed_values:
+            label = str(translator_row["value_user"]).strip()
+
+            if label:
+                labels.append(label)
+
+    if labels:
+        return ", ".join(labels)
+
+    return raw_value
+
+
 def actual_label_for_species(species_id, row):
     category = row["category"]
     subcat = row["subcategory_code"]
@@ -139,44 +178,43 @@ def actual_label_for_species(species_id, row):
             "label": pretty,
         }
 
-    # For direct categorical columns, show actual value, e.g.
-    # IUCN Red List Status: Least Concern
-    if subcat in birds.columns:
-        bird_row = birds.loc[birds["species_id"] == species_id]
-
-        if not bird_row.empty:
-            raw_value = bird_row.iloc[0][subcat]
-
-            if pd.notna(raw_value) and str(raw_value).strip():
-                return {
-                    "matches": False,
-                    "label": f"{category}: {str(raw_value).strip()}",
-                }
-
-    # For multivariate style traits, show actual values
+    # For multivariate / coded trait groups, show the bird's actual values.
+    # This needs to happen BEFORE the raw direct-column fallback, otherwise
+    # Nest_Type can return raw codes like PL or SP, which doesn't mean anything to most people
+    # and is therefore kinda lame. :/
     actual_values = actual_values_for_group(species_id, category, subcat)
 
     if actual_values:
         return {
             "matches": False,
-            "label": f"{category}: {', '.join(actual_values[:3])}"
+            "label": f"{category}: {', '.join(actual_values[:3])}",
         }
+
+    # For direct categorical columns, show actual value translated when possible,
+    # e.g. IUCN Red List Status: Least Concern, Nest Type: Platform.
+    if subcat in birds.columns:
+        bird_row = birds.loc[birds["species_id"] == species_id]
+
+        if not bird_row.empty:
+            raw_value = bird_row.iloc[0][subcat]
+            user_value = raw_value_to_user_label(category, subcat, raw_value)
+
+            if user_value:
+                return {
+                    "matches": False,
+                    "label": f"{category}: {user_value}",
+                }
 
     if ":" in pretty:
         category_part, value_part = pretty.split(":", 1)
         return {
             "matches": False,
-            "label": f"{category_part}: Unknown/Other"
+            "label": f"{category_part}: Unknown/Other",
         }
 
     return {
         "matches": False,
-        "label": f"{category}: Unknown/Other"
-    }
-
-    return {
-        "matches": False,
-        "label": f"Not {pretty}",
+        "label": f"{category}: Unknown/Other",
     }
 
 traits = {}
