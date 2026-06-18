@@ -773,6 +773,30 @@ html[data-theme="dark"] .birdoku-title {
     margin-bottom: 14px;
   }
 
+  .result-tooltip {
+    min-width: 210px;
+    max-width: min(260px, calc(100vw - 24px));
+    bottom: calc(100% + 8px);
+  }
+
+  .grid > .result-box:nth-child(4n + 2) .result-tooltip {
+    left: 0;
+    right: auto;
+    transform: none;
+  }
+
+  .grid > .result-box:nth-child(4n + 3) .result-tooltip {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  .grid > .result-box:nth-child(4n) .result-tooltip {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+
   .puzzle-meta {
     font-size: 20px;
     margin-top: -6px;
