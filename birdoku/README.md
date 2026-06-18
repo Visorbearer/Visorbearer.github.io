@@ -58,7 +58,8 @@ birdoku/
 **0.0.3.** Jun 17 2026. A few more gameplay updates.
 - Added a local streak tracker.
 - Added a playable archive of past games that does not effect your streak stats.
-
+- Bug fixes.
+- Added a logo.
 
 ## Future Improvements
 

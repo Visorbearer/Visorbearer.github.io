@@ -96,8 +96,60 @@ def truthy_series(series):
         & ~series.astype(str).str.strip().isin(["", "0", "0.0", "False", "false", "nan", "NaN"])
     )
 
+def expanded_category_rows(row):
+    category = str(row["category"]).strip()
+    subcat = str(row["subcategory_code"]).strip()
+    value_user = str(row["value_user"]).strip()
+    already_expanded = bool(row.get("_expanded", False))
+
+    # LAT categories are ordered:
+    # 1 Tropical
+    # 2 Tropical-Temperate
+    # 3 Temperate
+    # 4 Temperate-Polar
+    # 5 Tropical-Polar
+    if not already_expanded and category == "Location" and subcat == "LAT":
+        if value_user == "Tropical":
+            expanded = row.copy()
+            expanded["value"] = "1|2|5"
+            expanded["_expanded"] = True
+            return [expanded]
+
+        if value_user == "Temperate":
+            expanded = row.copy()
+            expanded["value"] = "2|3|4"
+            expanded["_expanded"] = True
+            return [expanded]
+
+    # For gameplay, count Single or in Pairs as acceptable for Solitary.
+    if not already_expanded and category == "Social Behavior" and value_user == "Solitary":
+        row_single_or_pairs = row.copy()
+        row_single_or_pairs["subcategory_code"] = "Social_4"
+        row_single_or_pairs["value"] = "1"
+        row_single_or_pairs["_expanded"] = True
+
+        row_solitary = row.copy()
+        row_solitary["subcategory_code"] = "Social_5"
+        row_solitary["value"] = "1"
+        row_solitary["_expanded"] = True
+
+        return [row_single_or_pairs, row_solitary]
+
+    return [row]
 
 def species_for_category(row):
+    expanded_rows = expanded_category_rows(row)
+
+    if len(expanded_rows) > 1:
+        species_ids = set()
+
+        for expanded_row in expanded_rows:
+            species_ids |= species_for_category(expanded_row)
+
+        return species_ids
+
+    row = expanded_rows[0]
+
     subcat = str(row["subcategory_code"]).strip()
     value = str(row["value"]).strip()
 
