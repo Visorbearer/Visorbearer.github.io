@@ -116,7 +116,14 @@ html[data-theme="dark"] .birdoku-title {
   color: var(--header-subtitle);
 }
 
-/* Header buttons */
+/* Header / modal buttons */
+
+.help-button,
+.theme-toggle-button,
+.modal-close-button {
+  appearance: none;
+  -webkit-appearance: none;
+}
 
 .help-button,
 .theme-toggle-button {
@@ -210,6 +217,10 @@ html[data-theme="dark"] .birdoku-title {
   background: rgba(0, 0, 0, 0.55);
   align-items: center;
   justify-content: center;
+}
+
+.modal-backdrop[aria-hidden="true"] {
+  display: none;
 }
 
 .modal-backdrop.is-open {
@@ -456,7 +467,7 @@ html[data-theme="dark"] .birdoku-title {
   margin-bottom: 24px;
 }
 
-button {
+.actions > button {
   background-color: var(--blue-button);
   color: white;
   border: 3px solid var(--ink);
@@ -471,7 +482,7 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+.actions > button:hover {
   background-color: var(--blue-button-hover);
 }
 
@@ -531,6 +542,7 @@ button:hover {
   flex-wrap: wrap;
   gap: 12px;
   justify-content: center;
+  margin-bottom: 14px;
 }
 
 .creator-links a {
@@ -668,6 +680,14 @@ button:hover {
     hyphens: none;
   }
 
+  .category-full {
+    display: none;
+  }
+
+  .category-short {
+    display: inline;
+  }
+
   .row-cat-box {
     min-height: clamp(78px, 22vw, 104px);
     font-size: clamp(9px, 2.25vw, 12px);
@@ -705,7 +725,7 @@ button:hover {
     padding: 9px 10px;
   }
 
-  button {
+  .actions > button {
     min-width: 250px;
     min-height: 72px;
     padding: 0.9rem 1.6rem;
@@ -724,5 +744,10 @@ button:hover {
     min-height: 40px;
     padding: 8px 12px;
     font-size: 13px;
+  }
+
+  .bmac-wrapper {
+    max-width: 100%;
+    overflow: hidden;
   }
 }
