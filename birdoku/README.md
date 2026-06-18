@@ -55,18 +55,22 @@ birdoku/
 - Added a light/dark mode toggle button.
 - Improved mobile display of the Birdoku grid.
 
+**0.0.3.** Jun 17 2026. A few more gameplay updates.
+- Added a local streak tracker.
+- Added a playable archive of past games that does not effect your streak stats.
+
 
 ## Future Improvements
 
 These are the things I'd like to add or update in the future to improve the game. I'll be removing them as they are accomplished.
 
-- Allow players to log in and save past scores and view stats + streaks (once there are stats)
+- Allow players to log in and save stats
 - Score rarity for each correct bird after submitting based on eBird observation count
-- Allow players to replay past games they missed, though they won't contribute to user score
 - Set images/illustrations to appear in the boxes after the answer is submitted
 - Create and add a logo to replace the bird emoji
-- Add an "endless mode" which endlessly generates new sets for users to play, though they don't effect score (but maybe can add an "endless mode streak" of how many endless mode games you've gotten 9/9 on in a row)
+- Add an "endless mode" which endlessly generates new sets for users to play, though they don't affect score (but maybe can add an "endless mode streak" of how many endless mode games you've gotten 9/9 on in a row)
 - Add script to override daily game with custom one which if manually run and add a "Today's Birdoku Designed by: " that prints on the page, where the name is pulled from the puzzle JSON and that text does not appear if there is no name listed
+- Add scientific name-based translator from current AviList common names to eBird common names
 
 ## Contact
 

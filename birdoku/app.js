@@ -4,6 +4,8 @@ const THEME_STORAGE_KEY = "birdoku_theme";
 let puzzle = null;
 let species = [];
 let speciesTraits = {};
+let puzzleDateKey = null;
+let archiveMode = false;
 
 function getTodayKey() {
   const now = new Date();
@@ -13,6 +15,25 @@ function getTodayKey() {
   const day = String(now.getDate()).padStart(2, "0");
 
   return `${year}${month}${day}`;
+}
+
+function getRequestedArchiveDateKey() {
+  const params = new URLSearchParams(window.location.search);
+  const requestedDate = params.get("date");
+
+  if (requestedDate && /^\d{8}$/.test(requestedDate)) {
+    return requestedDate;
+  }
+
+  return null;
+}
+
+function getPuzzleDateKey() {
+  return getRequestedArchiveDateKey() || getTodayKey();
+}
+
+function isArchiveMode() {
+  return getPuzzleDateKey() !== getTodayKey();
 }
 
 function displayDateFromKey(dateKey) {
@@ -95,15 +116,120 @@ function saveScore(dateKey, scoreData) {
   saveScores(scores);
 }
 
-async function loadGameData() {
-  const todayKey = getTodayKey();
+function parseDateKey(dateKey) {
+  const year = Number(dateKey.slice(0, 4));
+  const month = Number(dateKey.slice(4, 6)) - 1;
+  const day = Number(dateKey.slice(6, 8));
 
-  const puzzleResponse = await fetch(`./puzzles/${todayKey}.json`, {
+  return new Date(year, month, day);
+}
+
+function dateKeyFromDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}${month}${day}`;
+}
+
+function addDays(date, days) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function getCompletedDateKeys() {
+  return Object.keys(loadScores())
+    .filter((dateKey) => /^\d{8}$/.test(dateKey))
+    .sort();
+}
+
+function calculateCurrentStreak(todayKey) {
+  const scores = loadScores();
+  let streak = 0;
+
+  let cursor = parseDateKey(todayKey);
+
+  while (true) {
+    const cursorKey = dateKeyFromDate(cursor);
+
+    if (!scores[cursorKey]) {
+      break;
+    }
+
+    streak += 1;
+    cursor = addDays(cursor, -1);
+  }
+
+  return streak;
+}
+
+function calculateBestStreak() {
+  const completedKeys = getCompletedDateKeys();
+
+  if (completedKeys.length === 0) {
+    return 0;
+  }
+
+  let best = 1;
+  let current = 1;
+
+  for (let i = 1; i < completedKeys.length; i++) {
+    const previousDate = parseDateKey(completedKeys[i - 1]);
+    const currentDate = parseDateKey(completedKeys[i]);
+
+    const expectedNextKey = dateKeyFromDate(addDays(previousDate, 1));
+
+    if (completedKeys[i] === expectedNextKey) {
+      current += 1;
+    } else {
+      current = 1;
+    }
+
+    best = Math.max(best, current);
+  }
+
+  return best;
+}
+
+function calculatePlayedCount() {
+  return getCompletedDateKeys().length;
+}
+
+function calculateAverageScore() {
+  const scores = loadScores();
+  const completedKeys = getCompletedDateKeys();
+
+  if (completedKeys.length === 0) {
+    return null;
+  }
+
+  const total = completedKeys.reduce((sum, dateKey) => {
+    return sum + Number(scores[dateKey].score || 0);
+  }, 0);
+
+  return total / completedKeys.length;
+}
+
+function getStatsSummary(todayKey) {
+  return {
+    currentStreak: calculateCurrentStreak(todayKey),
+    bestStreak: calculateBestStreak(),
+    played: calculatePlayedCount(),
+    averageScore: calculateAverageScore(),
+  };
+}
+
+async function loadGameData() {
+  puzzleDateKey = getPuzzleDateKey();
+  archiveMode = isArchiveMode();
+
+  const puzzleResponse = await fetch(`./puzzles/${puzzleDateKey}.json`, {
     cache: "no-store",
   });
 
   if (!puzzleResponse.ok) {
-    throw new Error(`No puzzle found for ${todayKey}.`);
+    throw new Error(`No puzzle found for ${puzzleDateKey}.`);
   }
 
   const speciesResponse = await fetch("./data/species_lookup.json", {
@@ -346,11 +472,21 @@ function getCorrectCount(guesses) {
 }
 
 function buildShareText(scoreData) {
+  const title =
+    scoreData.mode === "archive"
+      ? `Birdoku Archive ${scoreData.displayDate}`
+      : `Birdoku ${scoreData.displayDate}`;
+
+  const playUrl =
+    scoreData.mode === "archive"
+      ? `https://masonmaron.com/birdoku/?date=${scoreData.date}`
+      : "https://masonmaron.com/birdoku/";
+
   return (
-    `Birdoku ${scoreData.displayDate}\n` +
+    `${title}\n` +
     `Score: ${scoreData.score}/9\n\n` +
     `${scoreData.scoreGrid}\n\n` +
-    `Play: https://masonmaron.com/birdoku/`
+    `Play: ${playUrl}`
   );
 }
 
@@ -441,6 +577,72 @@ function renderPuzzleMeta() {
   meta.appendChild(value);
 
   sectionTitle.insertAdjacentElement("afterend", meta);
+}
+
+function renderLocalStats() {
+  const existing = document.getElementById("local-stats");
+
+  if (existing) {
+    existing.remove();
+  }
+
+  const puzzleMeta = document.getElementById("puzzle-meta");
+  const insertAfter = puzzleMeta || document.querySelector(".section-title");
+
+  if (!insertAfter || !puzzle) {
+    return;
+  }
+
+  const stats = getStatsSummary(getTodayKey());
+
+  const statsEl = document.createElement("div");
+  statsEl.id = "local-stats";
+  statsEl.className = "local-stats";
+
+  const average =
+    stats.averageScore === null ? "-" : stats.averageScore.toFixed(1);
+
+  statsEl.innerHTML = `
+    <span title="Current Streak">🔥 ${stats.currentStreak}</span>
+    <span title="Best Streak">🏆 ${stats.bestStreak}</span>
+    <span title="Total Birdoku Completed">Played: ${stats.played}</span>
+  `;
+
+  insertAfter.insertAdjacentElement("afterend", statsEl);
+}
+
+function renderArchiveNotice() {
+  const existing = document.getElementById("archive-notice");
+
+  if (existing) {
+    existing.remove();
+  }
+
+  if (!archiveMode) {
+    return;
+  }
+
+  const insertAfter =
+    document.getElementById("local-stats") ||
+    document.getElementById("puzzle-meta") ||
+    document.querySelector(".section-title");
+
+  if (!insertAfter) {
+    return;
+  }
+
+  const notice = document.createElement("div");
+  notice.id = "archive-notice";
+  notice.className = "archive-notice";
+
+  notice.innerHTML = `
+    <strong>Archive Mode:</strong>
+    ${displayDateFromKey(puzzleDateKey)}.
+    This Birdoku will not affect your streak.
+    <a href="./">Play today's Birdoku</a>
+  `;
+
+  insertAfter.insertAdjacentElement("afterend", notice);
 }
 
 function renderPlayableGame() {
@@ -544,7 +746,7 @@ function renderCompletedGame(scoreData) {
 
       const label = document.createElement("div");
       label.className = "result-label";
-      label.textContent = guess || "—";
+      label.textContent = guess || "-";
       box.appendChild(label);
 
       if (guess) {
@@ -603,12 +805,17 @@ function submitGame() {
     score,
     scoreGrid,
     guesses,
+    mode: archiveMode ? "archive" : "daily",
     submittedAt: new Date().toISOString(),
   };
 
   scoreData.shareText = buildShareText(scoreData);
 
-  saveScore(puzzle.date, scoreData);
+  if (!archiveMode) {
+    saveScore(puzzle.date, scoreData);
+    renderLocalStats();
+  }
+
   renderCompletedGame(scoreData);
 }
 
@@ -622,6 +829,16 @@ async function init() {
 
     renderPuzzleMeta();
 
+    renderLocalStats();
+
+    renderArchiveNotice();
+
+    // This version would let you replay dates in the archive that
+    // you already played live
+    // const saved = archiveMode ? null : getSavedScore(puzzle.date);
+
+    // This version instead prevents you from replaying dates in the archive
+    // if you played them live
     const saved = getSavedScore(puzzle.date);
 
     if (saved) {
@@ -742,7 +959,109 @@ function setupThemeToggle() {
   }
 }
 
+// Archive mode dropdown stuff
+function formatArchiveDateLabel(dateKey) {
+  const year = dateKey.slice(0, 4);
+  const month = dateKey.slice(4, 6);
+  const day = dateKey.slice(6, 8);
+
+  return `${month}/${day}/${year}`;
+}
+
+async function loadArchiveDates() {
+  const response = await fetch("./puzzles/index.json", {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    return [];
+  }
+
+  const dates = await response.json();
+
+  return dates
+    .filter((dateKey) => /^\d{8}$/.test(dateKey))
+    .sort()
+    .reverse();
+}
+
+function closeArchiveDropdown() {
+  const dropdown = document.getElementById("archive-dropdown");
+
+  if (!dropdown) {
+    return;
+  }
+
+  dropdown.classList.remove("is-open");
+  dropdown.setAttribute("aria-hidden", "true");
+}
+
+async function toggleArchiveDropdown() {
+  const dropdown = document.getElementById("archive-dropdown");
+
+  if (!dropdown) {
+    return;
+  }
+
+  if (dropdown.classList.contains("is-open")) {
+    closeArchiveDropdown();
+    return;
+  }
+
+  dropdown.innerHTML = `<div class="archive-empty">Loading...</div>`;
+  dropdown.classList.add("is-open");
+  dropdown.setAttribute("aria-hidden", "false");
+
+  const dates = await loadArchiveDates();
+
+  dropdown.innerHTML = "";
+
+  if (dates.length === 0) {
+    dropdown.innerHTML = `<div class="archive-empty">No archive yet</div>`;
+    return;
+  }
+
+  for (const dateKey of dates) {
+    const link = document.createElement("a");
+    link.className = "archive-link";
+    link.href = dateKey === getTodayKey() ? "./" : `./?date=${dateKey}`;
+    link.textContent =
+      dateKey === getTodayKey()
+        ? `${formatArchiveDateLabel(dateKey)} - Today`
+        : formatArchiveDateLabel(dateKey);
+
+    dropdown.appendChild(link);
+  }
+}
+
+function setupArchiveDropdown() {
+  const button = document.getElementById("archive-button");
+  const dropdown = document.getElementById("archive-dropdown");
+
+  if (button) {
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleArchiveDropdown();
+    });
+  }
+
+  if (dropdown) {
+    dropdown.addEventListener("click", (event) => {
+      event.stopPropagation();
+    });
+  }
+
+  document.addEventListener("click", closeArchiveDropdown);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeArchiveDropdown();
+    }
+  });
+}
+
 setupHowToPlayModal();
 setupThemeToggle();
+setupArchiveDropdown();
 
 init();

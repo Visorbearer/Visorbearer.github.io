@@ -34,5 +34,17 @@ species = (
 with open(species_json, "w", encoding="utf-8") as f:
     json.dump(species, f, ensure_ascii=False, indent=2)
 
+puzzle_dates = sorted(
+    path.stem
+    for path in puzzles_dir.glob("*.json")
+    if path.stem.isdigit() and len(path.stem) == 8
+)
+
+index_path = puzzles_dir / "index.json"
+
+with open(index_path, "w", encoding="utf-8") as f:
+    json.dump(puzzle_dates, f, ensure_ascii=False, indent=2)
+
+print(f"Wrote {index_path}")
 print(f"Wrote {answers_dest}")
 print(f"Wrote {species_json}")
