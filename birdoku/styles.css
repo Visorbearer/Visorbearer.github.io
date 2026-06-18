@@ -260,6 +260,56 @@ button:hover {
   font-weight: 800;
 }
 
+.result-box {
+  position: relative;
+}
+
+.result-label {
+  position: relative;
+  z-index: 1;
+}
+
+.result-tooltip {
+  display: none;
+  position: absolute;
+  z-index: 50;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%);
+  min-width: 230px;
+  max-width: 320px;
+  padding: 10px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: white;
+  box-shadow: 4px 4px 0 var(--ink);
+  pointer-events: none;
+}
+
+.result-box:hover .result-tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tooltip-pill {
+  color: white;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.tooltip-good {
+  background: #2e8b57;
+}
+
+.tooltip-bad {
+  background: #c0392b;
+}
+
 @media (max-width: 700px) {
   .page {
     padding-left: 0.35rem;

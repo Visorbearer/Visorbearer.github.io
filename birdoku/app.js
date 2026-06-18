@@ -2,6 +2,7 @@ const STORAGE_KEY = "birdoku_scores_v1";
 
 let puzzle = null;
 let species = [];
+let speciesTraits = {};
 
 function getTodayKey() {
   const now = new Date();
@@ -82,8 +83,17 @@ async function loadGameData() {
     throw new Error("Could not load species list.");
   }
 
+  const traitsResponse = await fetch("./data/species_traits.json", {
+    cache: "no-store",
+  });
+
+  if (!traitsResponse.ok) {
+    throw new Error("Could not load species traits.");
+  }
+
   puzzle = await puzzleResponse.json();
   species = await speciesResponse.json();
+  speciesTraits = await traitsResponse.json();
 }
 
 function getCurrentGuesses() {
@@ -313,6 +323,37 @@ function buildShareText(scoreData) {
   );
 }
 
+function buildResultTooltip(guess, rowCat, colCat) {
+  const speciesStatus = speciesTraits[guess];
+
+  if (!speciesStatus) {
+    return null;
+  }
+
+  const rowStatus = speciesStatus[rowCat];
+  const colStatus = speciesStatus[colCat];
+
+  if (!rowStatus || !colStatus) {
+    return null;
+  }
+
+  const tooltip = document.createElement("div");
+  tooltip.className = "result-tooltip";
+
+  const rowLine = document.createElement("div");
+  rowLine.className = `tooltip-pill ${rowStatus.matches ? "tooltip-good" : "tooltip-bad"}`;
+  rowLine.textContent = rowStatus.label;
+
+  const colLine = document.createElement("div");
+  colLine.className = `tooltip-pill ${colStatus.matches ? "tooltip-good" : "tooltip-bad"}`;
+  colLine.textContent = colStatus.label;
+
+  tooltip.appendChild(rowLine);
+  tooltip.appendChild(colLine);
+
+  return tooltip;
+}
+
 function renderPlayableGame() {
   const game = document.getElementById("game");
   const actions = document.getElementById("actions");
@@ -411,7 +452,19 @@ function renderCompletedGame(scoreData) {
 
       const box = document.createElement("div");
       box.className = `result-box ${correct ? "correct-box" : "wrong-box"}`;
-      box.textContent = guess || "—";
+
+      const label = document.createElement("div");
+      label.className = "result-label";
+      label.textContent = guess || "—";
+      box.appendChild(label);
+
+      if (guess) {
+        const tooltip = buildResultTooltip(guess, row, col);
+
+        if (tooltip) {
+          box.appendChild(tooltip);
+        }
+      }
 
       grid.appendChild(box);
     }

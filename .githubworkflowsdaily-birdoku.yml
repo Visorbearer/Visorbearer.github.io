@@ -29,15 +29,19 @@ jobs:
 
       - name: Generate puzzle and static files
         run: |
-          python Birdoku/scripts/pick_cats.py
-          python Birdoku/scripts/build_static.py
+          python birdoku/scripts/pick_cats.py
+          python birdoku/scripts/build_static.py
+          python birdoku/scripts/build_species_traits.py
 
       - name: Commit generated Birdoku files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add Birdoku/answers/ Birdoku/birdoku/puzzles/ Birdoku/birdoku/data/species_lookup.json
+          git add birdoku/answers/
+          git add birdoku/puzzles/
+          git add birdoku/data/species_lookup.json
+          git add birdoku/data/species_traits.json
 
           if git diff --cached --quiet; then
             echo "No generated Birdoku changes to commit"

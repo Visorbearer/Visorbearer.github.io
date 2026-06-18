@@ -9,37 +9,51 @@ The way it works is simple. Using data from BIRDBASE *([Şekercioğlu et al. 202
 The directory looks like this:
 
 ```
-Birdoku/
+birdoku/
+│
+├── index.html                                               # Static Birdoku game base page
+├── styles.css                                               # Game styling
+├── app.js                                                   # Browser game logic
 │
 ├── data/
-│   ├── BIRDBASE v2025.1 Sekercioglu et al. Final.xlsx      # The BIRDBASE dataset
-│   ├── species_lookup.csv                                  # A lookup of all possible common names
-│   └── value_translator.csv                                # A BIRDBASE lookup for categories in Birdoku 
+│   ├── BIRDBASE v2025.1 Sekercioglu et al. Final.xlsx       # The BIRDBASE dataset
+│   ├── species_lookup.csv                                   # Source lookup of all possible common names
+│   ├── species_lookup.json                                  # Common-name lookup for autocomplete
+│   ├── species_traits.json                                  # Trait lookup for post-game hover tooltips
+│   └── value_translator.csv                                 # BIRDBASE lookup for categories used in Birdoku
 │
-├── answers/                                                # Each day's answers!
+├── answers/                                                 # Each day's answers
 │   ├── 20260616_answers.json
 │   ├── 20260617_answers.json
 │   └── ...
 │
-├── scripts/                                        
-│   ├── pick_cats.py                                        # Generates the daily grid + valid answers
-│   └── play_game.py                                        # Rudimentary local Streamlit game
+├── puzzles/                                                 # Daily puzzle files
+│   ├── 20260616.json
+│   ├── 20260617.json
+│   └── ...
 │
-├── README.md                                               # This!
+├── scripts/
+│   ├── pick_cats.py                                         # Generates the daily grid + valid answers
+│   ├── build_static.py                                      # Converts generated files for the static site
+│   ├── build_species_traits.py                              # Builds tooltip trait data from BIRDBASE
+│   └── play_game.py                                         # Old rudimentary local Streamlit version
 │
-├── requirements.txt                                        # Python env requirements
+├── README.md                                                # This!
+├── requirements.txt                                         # Python env requirements
 └── .gitignore
 ```
 
 ## Release Log
 
-It's not out yet! Just you wait... whoever you are who is reading my GitHub commit history :)
+**0.0.1.** Jun 17 2026. Initial release.
+
+**0.0.2.** Jun 17 2026. Added tooltips after submission to show user why their answer was incorrect.
 
 ## Future Improvements
 
 These are the things I'd like to add or update in the future to improve the game. I'll be removing them as they are accomplished.
 
-- Allow players to log in and save past scores and view stats (once there are stats)
+- Allow players to log in and save past scores and view stats + streaks (once there are stats)
 - Score rarity for each correct bird after submitting based on eBird observation count
 - Allow players to replay past games they missed, though they won't contribute to user score
 - Add a link within my site to this and a link for BMAC
@@ -47,6 +61,8 @@ These are the things I'd like to add or update in the future to improve the game
 - Set images/illustrations to appear in the boxes after the answer is submitted
 - Create and add a logo to replace the bird emoji
 - Add an "endless mode" which endlessly generates new sets for users to play, though they don't effect score (but maybe can add an "endless mode streak" of how many endless mode games you've gotten 9/9 on in a row)
+- Add script to override daily game with custom one which if manually run and add a "Today's Birdoku Designed by: " that prints on the page, where the name is pulled from the puzzle JSON and that text does not appear if there is no name listed
+- Add "Today's Difficulty" text where difficulty is classed based on average number of possible answers across cells
 
 ## Contact
 
