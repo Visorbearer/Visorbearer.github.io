@@ -82,11 +82,15 @@ value_translator = pd.read_csv(TRANSLATOR_PATH)
 value_translator = value_translator[value_translator["use"].str.lower() == "yes"].copy()
 
 # Cleanup
-value_translator["value"] = value_translator["value"].astype(str)
+value_translator["category"] = value_translator["category"].astype(str).str.strip()
+value_translator["subcategory_code"] = value_translator["subcategory_code"].astype(str).str.strip()
+value_translator["value"] = value_translator["value"].astype(str).str.strip()
+value_translator["value_user"] = value_translator["value_user"].astype(str).str.strip()
+
 value_translator["pretty_name"] = (
-    value_translator["category"].astype(str)
+    value_translator["category"]
     + ": "
-    + value_translator["value_user"].astype(str)
+    + value_translator["value_user"]
 )
 
 # Add grouped IUCN categories in-script
@@ -185,6 +189,25 @@ def species_for_category(row, birds, nest_details):
             return set()
 
         matches = birds[col].notna() & (birds[col] != 0)
+        return set(birds.loc[matches, "species_id"])
+
+    # For location realms, BirdBase can store combined realm strings.
+    # Example: AZNP means Australian + New Zealand + Nearctic + Palearctic.
+    # So Location: Australian should match any RLM containing "A".
+    elif subcat == "RLM":
+        col = subcat
+
+        if col not in birds.columns:
+            return set()
+
+        allowed_values = [v.strip() for v in value.split("|")]
+
+        raw_values = birds[col].fillna("").astype(str).str.strip()
+
+        matches = raw_values.apply(
+            lambda raw: any(code in raw for code in allowed_values)
+        )
+
         return set(birds.loc[matches, "species_id"])
 
     # For the non-classed stuff, BirdBase column equals translator value.

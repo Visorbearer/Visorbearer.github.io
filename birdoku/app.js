@@ -20,8 +20,13 @@ function getTodayKey() {
 function getRequestedArchiveDateKey() {
   const params = new URLSearchParams(window.location.search);
   const requestedDate = params.get("date");
+  const todayKey = getTodayKey();
 
-  if (requestedDate && /^\d{8}$/.test(requestedDate)) {
+  if (
+    requestedDate &&
+    /^\d{8}$/.test(requestedDate) &&
+    requestedDate < todayKey
+  ) {
     return requestedDate;
   }
 
@@ -1013,22 +1018,22 @@ async function toggleArchiveDropdown() {
   dropdown.setAttribute("aria-hidden", "false");
 
   const dates = await loadArchiveDates();
+  const todayKey = getTodayKey();
+
+  const archiveDates = dates.filter((dateKey) => dateKey < todayKey);
 
   dropdown.innerHTML = "";
 
-  if (dates.length === 0) {
+  if (archiveDates.length === 0) {
     dropdown.innerHTML = `<div class="archive-empty">No archive yet</div>`;
     return;
   }
 
-  for (const dateKey of dates) {
+  for (const dateKey of archiveDates) {
     const link = document.createElement("a");
     link.className = "archive-link";
-    link.href = dateKey === getTodayKey() ? "./" : `./?date=${dateKey}`;
-    link.textContent =
-      dateKey === getTodayKey()
-        ? `${formatArchiveDateLabel(dateKey)} - Today`
-        : formatArchiveDateLabel(dateKey);
+    link.href = `./?date=${dateKey}`;
+    link.textContent = formatArchiveDateLabel(dateKey);
 
     dropdown.appendChild(link);
   }

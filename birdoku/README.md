@@ -67,10 +67,10 @@ These are the things I'd like to add or update in the future to improve the game
 - Allow players to log in and save stats
 - Score rarity for each correct bird after submitting based on eBird observation count
 - Set images/illustrations to appear in the boxes after the answer is submitted
-- Create and add a logo to replace the bird emoji
 - Add an "endless mode" which endlessly generates new sets for users to play, though they don't affect score (but maybe can add an "endless mode streak" of how many endless mode games you've gotten 9/9 on in a row)
 - Add script to override daily game with custom one which if manually run and add a "Today's Birdoku Designed by: " that prints on the page, where the name is pulled from the puzzle JSON and that text does not appear if there is no name listed
 - Add scientific name-based translator from current AviList common names to eBird common names
+- Add a randomly-chosen "bird of the day" which is guaranteed to fit in the puzzle and, if it used in the puzzle that day, give an extra score point or something depending on how stats/points work long term-- also make the bird of the day link to the ebird page for it
 
 ## Contact
 
