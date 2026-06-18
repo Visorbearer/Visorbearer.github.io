@@ -5,9 +5,10 @@ import os
 import sys
 import json
 import random
+import argparse
 import pandas as pd
 from pathlib import Path
-from datetime import date
+from datetime import date, timedelta
 
 # Basics first
 
@@ -21,6 +22,36 @@ MIN_SPECIES_PER_CELL = 150
 MIN_SPECIES_PER_EXCEPTION_CELL = 10
 N_ROWS = 3
 N_COLS = 3
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Generate a daily Birdoku puzzle.")
+
+    parser.add_argument(
+        "--date",
+        help="Puzzle date in YYYYMMDD format. Defaults to today.",
+    )
+
+    parser.add_argument(
+        "--tomorrow",
+        action="store_true",
+        help="Generate tomorrow's puzzle instead of today's.",
+    )
+
+    args = parser.parse_args()
+
+    if args.date and args.tomorrow:
+        raise ValueError("Use either --date or --tomorrow, not both.")
+
+    if args.date:
+        if len(args.date) != 8 or not args.date.isdigit():
+            raise ValueError("--date must be in YYYYMMDD format.")
+
+        return args.date
+
+    if args.tomorrow:
+        return (date.today() + timedelta(days=1)).strftime("%Y%m%d")
+
+    return date.today().strftime("%Y%m%d")
 
 # Categories that are allowed into the category pool even if they have <100 total species
 # Cells involving these categories only need >= MIN_SPECIES_PER_EXCEPTION_CELL valid answers
@@ -37,10 +68,11 @@ MIN_SPECIES_EXCEPTIONS = {
 }
 
 # For saving the generated answers
-TODAY = date.today().strftime("%Y%m%d")
+PUZZLE_DATE = parse_args()
 ANSWERS_DIR = ROOT / "answers"
 ANSWERS_DIR.mkdir(exist_ok=True)
-out_path = ANSWERS_DIR / f"{TODAY}_answers.json"
+print(f"Generating Birdoku puzzle for {PUZZLE_DATE}")
+out_path = ANSWERS_DIR / f"{PUZZLE_DATE}_answers.json"
 
 # The nitty gritty
 
@@ -261,7 +293,7 @@ for r in row_cats:
 
 # Save the generated answers to a JSON file
 output = {
-    "date": TODAY,
+    "date": PUZZLE_DATE,
     "rows": row_cats,
     "cols": col_cats,
     "cells": {}

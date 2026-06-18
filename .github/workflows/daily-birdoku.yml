@@ -2,7 +2,9 @@ name: Daily Birdoku Puzzle
 
 on:
   schedule:
-    # 00:01 EST = 05:01 UTC
+    # Runs at 05:01 UTC daily.
+    # This is 12:01 AM EST / 1:01 AM EDT.
+    # It generates tomorrow's puzzle so the next puzzle is ready before the date changes.
     - cron: "1 5 * * *"
   workflow_dispatch:
 
@@ -27,11 +29,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas openpyxl
 
+      - name: Set puzzle date
+        run: |
+          PUZZLE_DATE=$(TZ=America/New_York date -d 'tomorrow' +'%Y%m%d')
+          echo "PUZZLE_DATE=$PUZZLE_DATE" >> "$GITHUB_ENV"
+          echo "Generating Birdoku puzzle for $PUZZLE_DATE"
+
       - name: Generate puzzle and static files
         run: |
-          python birdoku/scripts/pick_cats.py
-          python birdoku/scripts/build_static.py
-          python birdoku/scripts/build_species_traits.py
+          python birdoku/scripts/pick_cats.py --date "$PUZZLE_DATE"
+          python birdoku/scripts/build_static.py --date "$PUZZLE_DATE"
 
       - name: Commit generated Birdoku files
         run: |
@@ -41,11 +48,10 @@ jobs:
           git add birdoku/answers/
           git add birdoku/puzzles/
           git add birdoku/data/species_lookup.json
-          git add birdoku/data/species_traits.json
 
           if git diff --cached --quiet; then
             echo "No generated Birdoku changes to commit"
           else
-            git commit -m "Generate daily Birdoku puzzle"
+            git commit -m "Generate Birdoku puzzle for $PUZZLE_DATE"
             git push
           fi
