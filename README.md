@@ -21,6 +21,7 @@ Visorbearer.github.io/
 │   └── og.jpg
 ├── style.css
 ├── main.js
+├── birdoku/            # Folder for the Birdoku web game-- nested folder structure is described in its internal README
 └── CNAME
 ```
 
