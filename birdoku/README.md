@@ -47,7 +47,14 @@ birdoku/
 
 **0.0.1.** Jun 17 2026. Initial release.
 
-**0.0.2.** Jun 17 2026. Added tooltips after submission to show user why their answer was incorrect.
+**0.0.2.** Jun 17 2026. QOL updates for the UI!
+- Added tooltips after submission to show user why their answer was incorrect. 
+- Added "how to play" button and pop-up. 
+- Added difficulty score and increased minimum number of species needed for an acceptable cell to 150.
+- Added social links, non-commercial use disclaimer, and link to BIRDBASE Explorer.
+- Added a light/dark mode toggle button.
+- Improved mobile display of the Birdoku grid.
+
 
 ## Future Improvements
 
@@ -56,13 +63,10 @@ These are the things I'd like to add or update in the future to improve the game
 - Allow players to log in and save past scores and view stats + streaks (once there are stats)
 - Score rarity for each correct bird after submitting based on eBird observation count
 - Allow players to replay past games they missed, though they won't contribute to user score
-- Add a link within my site to this and a link for BMAC
-- Add a question mark in circle icon to the top right which can be clicked on to bring up a brief "How to Play" overlay while graying out the background
 - Set images/illustrations to appear in the boxes after the answer is submitted
 - Create and add a logo to replace the bird emoji
 - Add an "endless mode" which endlessly generates new sets for users to play, though they don't effect score (but maybe can add an "endless mode streak" of how many endless mode games you've gotten 9/9 on in a row)
 - Add script to override daily game with custom one which if manually run and add a "Today's Birdoku Designed by: " that prints on the page, where the name is pulled from the puzzle JSON and that text does not appear if there is no name listed
-- Add "Today's Difficulty" text where difficulty is classed based on average number of possible answers across cells
 
 ## Contact
 

@@ -1,4 +1,5 @@
 const STORAGE_KEY = "birdoku_scores_v1";
+const THEME_STORAGE_KEY = "birdoku_theme";
 
 let puzzle = null;
 let species = [];
@@ -22,15 +23,45 @@ function displayDateFromKey(dateKey) {
   return `${month}/${day}/${year}`;
 }
 
+function addPreferredBreaks(value) {
+  return escapeHtml(value)
+    .replaceAll(", ", ",<wbr> ")
+    .replaceAll("/", "/<wbr>");
+}
+
+function shortCategoryName(category) {
+  const replacements = {
+    "IUCN Red List Status": "IUCN Red List Status",
+    "Social Behavior": "Social Behavior",
+    "Nest Substrate": "Nest Substrate",
+    "Nest Type": "Nest Type",
+    "Nest Parasitism": "Nest Parasitism",
+    "Movement": "Movement",
+    "Location": "Location",
+    "Habitat": "Habitat",
+    "Diet": "Diet",
+    "Volancy": "Volancy"
+  };
+
+  return replacements[category] || category;
+}
+
 function formatCategoryLabel(label) {
   if (!label.includes(":")) {
-    return escapeHtml(label);
+    return addPreferredBreaks(label);
   }
 
   const [first, ...restParts] = label.split(":");
   const rest = restParts.join(":").trim();
 
-  return `<strong>${escapeHtml(first)}:</strong>&nbsp;${escapeHtml(rest)}`;
+  return `
+    <span class="category-full">
+      <strong>${escapeHtml(first)}:</strong>&nbsp;${addPreferredBreaks(rest)}
+    </span>
+    <span class="category-short">
+      <strong>${escapeHtml(shortCategoryName(first))}:</strong> ${addPreferredBreaks(rest)}
+    </span>
+  `;
 }
 
 function escapeHtml(value) {
@@ -354,6 +385,64 @@ function buildResultTooltip(guess, rowCat, colCat) {
   return tooltip;
 }
 
+function getAveragePossibleAnswers() {
+  const counts = [];
+
+  for (const row of puzzle.rows) {
+    for (const col of puzzle.cols) {
+      const key = `${row} × ${col}`;
+      counts.push(puzzle.cells[key].length);
+    }
+  }
+
+  const total = counts.reduce((sum, count) => sum + count, 0);
+  return total / counts.length;
+}
+
+function classifyDifficulty(avgAnswers) {
+  if (avgAnswers >= 750) {
+    return "Easy";
+  }
+
+  if (avgAnswers >= 250) {
+    return "Medium";
+  }
+
+  if (avgAnswers >= 100) {
+    return "Hard";
+  }
+
+  return "Extreme";
+}
+
+function renderPuzzleMeta() {
+  const sectionTitle = document.querySelector(".section-title");
+
+  if (!sectionTitle || document.getElementById("puzzle-meta")) {
+    return;
+  }
+
+  const avgAnswers = getAveragePossibleAnswers();
+  const difficulty = classifyDifficulty(avgAnswers);
+
+  const meta = document.createElement("div");
+  meta.id = "puzzle-meta";
+  meta.className = "puzzle-meta";
+  meta.title = `Average possible answers per cell: ${avgAnswers.toFixed(1)}`;
+
+  const label = document.createElement("span");
+  label.textContent = "Difficulty: ";
+
+  const value = document.createElement("span");
+  value.className = `difficulty-value difficulty-${difficulty.toLowerCase()}`;
+  value.textContent = difficulty;
+
+  meta.appendChild(label);
+  meta.appendChild(value);
+
+  sectionTitle.insertAdjacentElement("afterend", meta);
+}
+
 function renderPlayableGame() {
   const game = document.getElementById("game");
   const actions = document.getElementById("actions");
@@ -531,6 +620,8 @@ async function init() {
 
     loading.style.display = "none";
 
+    renderPuzzleMeta();
+
     const saved = getSavedScore(puzzle.date);
 
     if (saved) {
@@ -543,5 +634,115 @@ async function init() {
     loading.textContent = error.message;
   }
 }
+
+
+// How to Play popup stuff
+function openHowToPlay() {
+  const modal = document.getElementById("how-to-play-modal");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.add("is-open");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+}
+
+function closeHowToPlay() {
+  const modal = document.getElementById("how-to-play-modal");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.remove("is-open");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+}
+
+function setupHowToPlayModal() {
+  const openButton = document.getElementById("how-to-play-button");
+  const closeButton = document.getElementById("how-to-play-close");
+  const modal = document.getElementById("how-to-play-modal");
+
+  if (openButton) {
+    openButton.addEventListener("click", openHowToPlay);
+  }
+
+  if (closeButton) {
+    closeButton.addEventListener("click", closeHowToPlay);
+  }
+
+  if (modal) {
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        closeHowToPlay();
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeHowToPlay();
+    }
+  });
+}
+
+function getPreferredTheme() {
+  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+
+  if (savedTheme === "light" || savedTheme === "dark") {
+    return savedTheme;
+  }
+
+  if (
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  ) {
+    return "dark";
+  }
+
+  return "light";
+}
+
+// Apply light/dark mode
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+
+  const button = document.getElementById("theme-toggle-button");
+
+  if (button) {
+    button.textContent = theme === "dark" ? "☀️" : "🌙";
+    button.setAttribute(
+      "aria-label",
+      theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+    );
+  }
+}
+
+// Toggle between light an dark mode
+function toggleTheme() {
+  const currentTheme =
+    document.documentElement.getAttribute("data-theme") || getPreferredTheme();
+
+  const nextTheme = currentTheme === "dark" ? "light" : "dark";
+
+  localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+  applyTheme(nextTheme);
+}
+
+function setupThemeToggle() {
+  applyTheme(getPreferredTheme());
+
+  const button = document.getElementById("theme-toggle-button");
+
+  if (button) {
+    button.addEventListener("click", toggleTheme);
+  }
+}
+
+setupHowToPlayModal();
+setupThemeToggle();
 
 init();

@@ -12,12 +12,37 @@
     rel="stylesheet"
   >
 
+  <script>
+    (function () {
+      try {
+        const savedTheme = localStorage.getItem("birdoku_theme");
+        const prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+        const theme = savedTheme || (prefersDark ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch {
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    })();
+  </script>
+
   <link rel="stylesheet" href="./styles.css" />
 </head>
 
 <body>
   <main class="page">
     <header class="birdoku-header">
+
+      <button id="theme-toggle-button" class="theme-toggle-button" type="button" aria-label="Toggle light and dark mode">
+        🌙
+      </button>
+
+      <button id="how-to-play-button" class="help-button" type="button" aria-label="How to play">
+        ?
+      </button>
+
       <div class="birdoku-logo-placeholder">🐦</div>
       <div>
         <div class="birdoku-title">Birdoku</div>
@@ -38,14 +63,75 @@
         <a href="https://masonmaron.com/" target="_blank">Mason Maron</a>
         and inspired by
         <a href="https://pokedoku.com/" target="_blank">PokeDoku</a>.
+      </p>
+
+      <div class="creator-links">
+          <a href="https://masonmaron.com/" target="_blank" rel="noopener">Personal Website</a>
+          <a href="https://bsky.app/profile/masonm.bsky.social" target="_blank" rel="noopener">BlueSky</a>
+      </div>
+
+      <div class="bmac-wrapper">
+        <script
+          type="text/javascript"
+          src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+          data-name="bmc-button"
+          data-slug="masonmaron"
+          data-color="#FFDD00"
+          data-emoji="🍵"
+          data-font="Poppins"
+          data-text="Buy Me a Coffee"
+          data-outline-color="#000000"
+          data-font-color="#000000"
+          data-coffee-color="#ffffff">
+        </script>
+      </div>
+      
+      <p>
         Species trait data comes from
         <a href="https://doi.org/10.1038/s41597-025-05615-3" target="_blank">BIRDBASE</a>,
-        but this project is not affiliated with BIRDBASE or its creators in any way.
-        Any errors in gameplay categories may reflect either data limitations or developer implementation choices.
-        This game is still in development and may contain bugs or incomplete features. Thanks for checking it out!
+        but this project is not affiliated with BIRDBASE or its creators in any way. BIRDBASE data can be easily explored
+        through the <a href="https://birds.imsezer.com/" target="_blank">BIRDBASE Explorer</a>.
+      </p>
+      
+      <p>
+        Although donations to support maintenance of this project are appreciated, Birdoku is a free, 
+        non-commercial application. Any errors in gameplay categories may reflect either data limitations 
+        or developer implementation choices. This game is still in development and may contain bugs or 
+        incomplete features. Thanks for checking it out!
       </p>
     </footer>
   </main>
+
+  <div id="how-to-play-modal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="how-to-play-title">
+      <button id="how-to-play-close" class="modal-close-button" type="button" aria-label="Close How to Play">
+        ×
+      </button>
+
+      <h2 id="how-to-play-title">How to Play</h2>
+
+      <p>
+        Fill each square with a bird species that matches both the row category and the column category.
+      </p>
+
+      <p>
+        Each bird can only be used once. As you type, the game will suggest matching species.
+      </p>
+
+      <p>
+        Once you feel confident in your selections, submit your answers by clicking the "Submit" button.
+      </p>
+
+      <p>
+        After submitting, your results will be displayed. Green squares indicate correct answers and red squares
+        incorrect answers. Hover over submitted answers to see how that bird fits into the two categories.
+      </p>
+
+      <p>
+        Your submission is saved locally in your browser, so you can only play each day once.
+      </p>
+    </div>
+  </div>
 
   <script src="./app.js"></script>
 </body>
