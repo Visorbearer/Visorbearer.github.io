@@ -130,7 +130,7 @@ function buildCategoryInfoPopover(categoryLabel) {
 
   const title = document.createElement("div");
   title.className = "category-info-title";
-  title.textContent = `${group} options`;
+  title.textContent = `${group} Options`;
 
   const list = document.createElement("ul");
   list.className = "category-info-list";
