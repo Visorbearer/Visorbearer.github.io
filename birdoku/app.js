@@ -883,30 +883,54 @@ function closeHowToPlay() {
   document.body.classList.remove("modal-open");
 }
 
+function openHowToPlayModal() {
+  const modal = document.getElementById("how-to-play-modal");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.add("is-open");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+}
+
+function closeHowToPlayModal() {
+  const modal = document.getElementById("how-to-play-modal");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.remove("is-open");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+}
+
 function setupHowToPlayModal() {
-  const openButton = document.getElementById("how-to-play-button");
+  const button = document.getElementById("how-to-play-button");
   const closeButton = document.getElementById("how-to-play-close");
   const modal = document.getElementById("how-to-play-modal");
 
-  if (openButton) {
-    openButton.addEventListener("click", openHowToPlay);
+  if (button) {
+    button.addEventListener("click", openHowToPlayModal);
   }
 
   if (closeButton) {
-    closeButton.addEventListener("click", closeHowToPlay);
+    closeButton.addEventListener("click", closeHowToPlayModal);
   }
 
   if (modal) {
     modal.addEventListener("click", (event) => {
       if (event.target === modal) {
-        closeHowToPlay();
+        closeHowToPlayModal();
       }
     });
   }
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
-      closeHowToPlay();
+      closeHowToPlayModal();
     }
   });
 }
@@ -1069,4 +1093,6 @@ setupHowToPlayModal();
 setupThemeToggle();
 setupArchiveDropdown();
 
-init();
+init().then(() => {
+  openHowToPlayModal();
+});
