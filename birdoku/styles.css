@@ -719,6 +719,52 @@ html[data-theme="dark"] .birdoku-title {
   font-weight: 800;
 }
 
+/* Incomplete submit modal */
+
+.confirm-modal-card {
+  max-width: 520px;
+  text-align: center;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.confirm-button {
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 150px;
+  min-height: 54px;
+  padding: 10px 16px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  color: white;
+  box-shadow: 4px 4px 0 var(--ink);
+  font-family: var(--body-font);
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.confirm-yes {
+  background: #2e8b57;
+}
+
+.confirm-no {
+  background: #c0392b;
+}
+
+.confirm-yes:hover {
+  background: #247046;
+}
+
+.confirm-no:hover {
+  background: #9f2f24;
+}
+
 /* Clickable category headers */
 
 .clickable-category {
@@ -908,6 +954,16 @@ html[data-theme="dark"] .birdoku-title {
 
   .modal-card p {
     font-size: 15px;
+  }
+
+  .confirm-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .confirm-button {
+    width: 100%;
+    max-width: 260px;
   }
 
   .grid {

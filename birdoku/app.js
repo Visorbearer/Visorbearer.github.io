@@ -920,6 +920,19 @@ function submitGame() {
   closeSuggestions();
 
   const guesses = getCurrentGuesses();
+
+  if (hasEmptyGuesses(guesses)) {
+    openIncompleteSubmitModal(() => {
+      finalizeSubmitGame(guesses);
+    });
+
+    return;
+  }
+
+  finalizeSubmitGame(guesses);
+}
+
+function finalizeSubmitGame(guesses) {
   const score = getCorrectCount(guesses);
   const scoreGrid = getScoreGrid(guesses);
   const displayDate = displayDateFromKey(puzzle.date);
@@ -1053,6 +1066,54 @@ function setupHowToPlayModal() {
       closeHowToPlayModal();
     }
   });
+}
+
+function hasEmptyGuesses(guesses) {
+  return Object.values(guesses).some((guess) => !guess.trim());
+}
+
+function openIncompleteSubmitModal(onConfirm) {
+  const modal = document.getElementById("incomplete-submit-modal");
+  const yesButton = document.getElementById("incomplete-submit-yes");
+  const noButton = document.getElementById("incomplete-submit-no");
+
+  if (!modal || !yesButton || !noButton) {
+    onConfirm();
+    return;
+  }
+
+  function closeModal() {
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+
+    yesButton.removeEventListener("click", handleYes);
+    noButton.removeEventListener("click", handleNo);
+    modal.removeEventListener("click", handleBackdrop);
+  }
+
+  function handleYes() {
+    closeModal();
+    onConfirm();
+  }
+
+  function handleNo() {
+    closeModal();
+  }
+
+  function handleBackdrop(event) {
+    if (event.target === modal) {
+      closeModal();
+    }
+  }
+
+  yesButton.addEventListener("click", handleYes);
+  noButton.addEventListener("click", handleNo);
+  modal.addEventListener("click", handleBackdrop);
+
+  modal.classList.add("is-open");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
 }
 
 function getPreferredTheme() {

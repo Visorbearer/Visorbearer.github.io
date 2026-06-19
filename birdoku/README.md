@@ -72,6 +72,7 @@ birdoku/
 - Shifted difficulty rating frame down.
 - Added clickable/tappable categories to see all options within the category and updated How to Play accordingly.
 - Embedded the README/Changelog into the webpage.
+- Add a warning popup if the user tries to submit an incomplete Birdoku
 
 ## Future Improvements
 
