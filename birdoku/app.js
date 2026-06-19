@@ -733,6 +733,49 @@ function renderLocalStats() {
   insertAfter.insertAdjacentElement("afterend", statsEl);
 }
 
+function renderDesignerCredit() {
+  const existing = document.getElementById("designer-credit");
+
+  if (existing) {
+    existing.remove();
+  }
+
+  if (!puzzle || !puzzle.designer) {
+    return;
+  }
+
+  const insertAfter =
+    document.getElementById("puzzle-meta") ||
+    document.querySelector(".section-title");
+
+  if (!insertAfter) {
+    return;
+  }
+
+  const credit = document.createElement("div");
+  credit.id = "designer-credit";
+  credit.className = "designer-credit";
+
+  const label = document.createElement("span");
+  label.textContent = "Today's Birdoku Designed by: ";
+  credit.appendChild(label);
+
+  if (puzzle.designer_url) {
+    const link = document.createElement("a");
+    link.href = puzzle.designer_url;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.textContent = puzzle.designer;
+    credit.appendChild(link);
+  } else {
+    const name = document.createElement("span");
+    name.textContent = puzzle.designer;
+    credit.appendChild(name);
+  }
+
+  insertAfter.insertAdjacentElement("afterend", credit);
+}
+
 function renderArchiveNotice() {
   const existing = document.getElementById("archive-notice");
 
@@ -966,6 +1009,8 @@ async function init() {
     loading.style.display = "none";
 
     renderPuzzleMeta();
+
+    renderDesignerCredit();
 
     renderLocalStats();
 

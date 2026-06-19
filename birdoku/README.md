@@ -63,16 +63,17 @@ birdoku/
 
 **0.0.3.** Jun 17 2026. A few more gameplay updates.
 - Added a local streak tracker.
-- Added a playable archive of past games that does not effect your streak stats.
+- Added a playable archive of past games that does not affect your streak stats.
 - Bug fixes.
 - Added a logo.
 
 **0.0.4.** Jun 19 2026. Improvements based on user feedback!
 - Changed streaks to be based on "wins" (9/9) instead of just playing.
-- Shifted difficulty rating frame down.
+- Shifted the difficulty rating frame down and added penalties for special categories.
 - Added clickable/tappable categories to see all options within the category and updated How to Play accordingly.
 - Embedded the README/Changelog into the webpage.
-- Add a warning popup if the user tries to submit an incomplete Birdoku
+- Added a warning popup if the user tries to submit an incomplete Birdoku.
+- Added a script to allow for the creation of custom daily games and relevant updates in other scripts.
 
 ## Future Improvements
 
@@ -82,7 +83,6 @@ These are the things I'd like to add or update in the future to improve the game
 - Score rarity for each correct bird after submitting based on eBird observation count
 - Set images/illustrations to appear in the boxes after the answer is submitted
 - Add an "endless mode" which endlessly generates new sets for users to play, though they don't affect score (but maybe can add an "endless mode streak" of how many endless mode games you've gotten 9/9 on in a row)
-- Add script to override daily game with custom one which if manually run and add a "Today's Birdoku Designed by: " that prints on the page, where the name is pulled from the puzzle JSON and that text does not appear if there is no name listed
 - Add scientific name-based translator from current AviList common names to eBird common names
 - Add a randomly-chosen "bird of the day" which is guaranteed to fit in the puzzle and, if it used in the puzzle that day, give an extra score point or something depending on how stats/points work long term-- also make the bird of the day link to the ebird page for it
 

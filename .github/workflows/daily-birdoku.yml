@@ -33,9 +33,20 @@ jobs:
         run: |
           PUZZLE_DATE=$(TZ=America/New_York date -d 'tomorrow' +'%Y%m%d')
           echo "PUZZLE_DATE=$PUZZLE_DATE" >> "$GITHUB_ENV"
-          echo "Generating Birdoku puzzle for $PUZZLE_DATE"
+          echo "Target Birdoku puzzle date: $PUZZLE_DATE"
+
+      - name: Check if puzzle already exists
+        run: |
+          if [ -f "birdoku/puzzles/$PUZZLE_DATE.json" ]; then
+            echo "Puzzle for $PUZZLE_DATE already exists. Skipping random generation."
+            echo "SKIP_BIRDOKU_GENERATION=true" >> "$GITHUB_ENV"
+          else
+            echo "No puzzle exists for $PUZZLE_DATE. Generating random puzzle."
+            echo "SKIP_BIRDOKU_GENERATION=false" >> "$GITHUB_ENV"
+          fi
 
       - name: Generate puzzle and static files
+        if: env.SKIP_BIRDOKU_GENERATION != 'true'
         run: |
           python birdoku/scripts/pick_cats.py --date "$PUZZLE_DATE"
           python birdoku/scripts/build_static.py --date "$PUZZLE_DATE"
