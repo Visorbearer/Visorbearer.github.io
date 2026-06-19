@@ -265,9 +265,15 @@ html[data-theme="dark"] .birdoku-title {
   right: 14px;
   width: 102px;
   z-index: 60;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
 }
 
-.archive-button {
+.archive-button,
+.endless-button {
   appearance: none;
   -webkit-appearance: none;
   width: 102px;
@@ -287,14 +293,19 @@ html[data-theme="dark"] .birdoku-title {
   cursor: pointer;
 }
 
-.archive-button:hover {
+.archive-button:hover,
+.endless-button:hover {
   background: var(--soft-gray);
+}
+
+.endless-button {
+  margin-top: 0;
 }
 
 .archive-dropdown {
   display: none;
   position: absolute;
-  top: calc(100% + 8px);
+  top: 42px;
   right: 0;
   width: 170px;
   max-height: 260px;
@@ -812,6 +823,57 @@ html[data-theme="dark"] .birdoku-title {
   line-height: 1.35;
 }
 
+/* Endless mode button */
+.endless-button {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 102px;
+  min-width: 102px;
+  height: 34px;
+  min-height: 34px;
+  padding: 0;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  background: var(--card-bg);
+  color: var(--text-main);
+  box-shadow: 4px 4px 0 var(--ink);
+  font-family: var(--body-font);
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.endless-button:hover {
+  background: var(--soft-gray);
+}
+
+.endless-notice {
+  max-width: 720px;
+  margin: -10px auto 22px;
+  padding: 10px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: var(--card-bg);
+  box-shadow: 3px 3px 0 var(--ink);
+  color: var(--text-main);
+  text-align: center;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.endless-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+.endless-actions > button {
+  min-width: 240px;
+}
+
 /* Designer credit for custom games */
 
 .designer-credit {
@@ -828,6 +890,107 @@ html[data-theme="dark"] .birdoku-title {
   font-weight: 900;
 }
 
+/* Settings modal */
+
+.settings-modal-card {
+  max-width: 520px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 18px 0;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.settings-row select {
+  min-width: 160px;
+  padding: 10px 12px;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  background: var(--card-bg);
+  color: var(--text-main);
+  font-family: var(--body-font);
+  font-weight: 900;
+}
+
+/* eBird links and embeds */
+.bird-detail-card {
+  max-width: 560px;
+  text-align: left;
+}
+
+.bird-detail-header {
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.bird-detail-title {
+  margin: 0;
+  font-family: var(--pixel-font);
+  font-size: clamp(20px, 4vw, 28px);
+  line-height: 1.35;
+}
+
+.bird-detail-title a {
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+.bird-detail-scientific {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 800;
+}
+
+.bird-detail-image-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 14px auto;
+}
+
+.bird-detail-image {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: var(--soft-gray);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.bird-detail-traits {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.bird-detail-fallback {
+  margin: 0;
+  text-align: center;
+  font-weight: 900;
+}
+
+.result-box {
+  cursor: pointer;
+}
+
+.tooltip-hint {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 900;
+  text-align: center;
+}
+
 /* Mobile */
 
 @media (max-width: 700px) {
@@ -840,7 +1003,7 @@ html[data-theme="dark"] .birdoku-title {
   .birdoku-header {
     padding: 22px 16px 28px;
     gap: 14px;
-    min-height: 135px;
+    min-height: 150px;
     align-items: flex-start;
   }
 
@@ -936,6 +1099,16 @@ html[data-theme="dark"] .birdoku-title {
     padding: 4px 7px;
   }
 
+  .settings-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .settings-row select {
+    width: 100%;
+  }
+
   .archive-notice {
     margin-top: -8px;
     margin-bottom: 16px;
@@ -947,9 +1120,11 @@ html[data-theme="dark"] .birdoku-title {
     top: 56px;
     right: 8px;
     width: 78px;
+    gap: 8px;
   }
 
-  .archive-button {
+  .archive-button,
+  .endless-button {
     width: 78px;
     min-width: 78px;
     height: 28px;
@@ -961,6 +1136,7 @@ html[data-theme="dark"] .birdoku-title {
   }
 
   .archive-dropdown {
+    top: 36px;
     width: 145px;
     max-height: 230px;
   }
@@ -1064,6 +1240,14 @@ html[data-theme="dark"] .birdoku-title {
     padding: 0.9rem 1.6rem;
     font-size: 14px;
   }
+  
+  .bird-detail-image {
+    max-height: 220px;
+  }
+
+  .bird-detail-scientific {
+    font-size: 14px;
+  }
 
   .creator-card {
     padding: 18px 14px;
@@ -1082,6 +1266,34 @@ html[data-theme="dark"] .birdoku-title {
   .bmac-wrapper {
     max-width: 100%;
     overflow: hidden;
+  }
+
+  .endless-button {
+    width: 78px;
+    min-width: 78px;
+    height: 28px;
+    min-height: 28px;
+    border-width: 2px;
+    border-radius: 9px;
+    box-shadow: 3px 3px 0 var(--ink);
+    font-size: 10px;
+  }
+
+  .endless-notice {
+    margin-top: -8px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .endless-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .endless-actions > button {
+    width: 100%;
+    max-width: 260px;
   }
 
   .category-info-popover {

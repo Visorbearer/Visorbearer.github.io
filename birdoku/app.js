@@ -1,5 +1,7 @@
 const STORAGE_KEY = "birdoku_scores_v1";
+const ENDLESS_STATS_STORAGE_KEY = "birdoku_endless_stats_v1";
 const THEME_STORAGE_KEY = "birdoku_theme";
+const TAXONOMY_STORAGE_KEY = "birdoku_taxonomy";
 
 const DIFFICULTY_EXCEPTION_CATEGORIES = new Set([
   "Volancy: Flightless",
@@ -11,12 +13,25 @@ const DIFFICULTY_EXCEPTION_CATEGORIES = new Set([
   "Nest Substrate: Cactus",
 ]);
 
+const ENDLESS_MIN_SPECIES_PER_CELL = 150;
+const ENDLESS_MIN_SPECIES_PER_EXCEPTION_CELL = 10;
+const ENDLESS_MAX_ATTEMPTS = 5000;
+
 let puzzle = null;
 let species = [];
 let speciesTraits = {};
+let taxonomyLookup = {
+  byScientific: {},
+  byAviListCommon: {},
+  nameToScientific: {},
+};
+let ebirdImageLookup = {};
 let categoryReference = {};
 let puzzleDateKey = null;
 let archiveMode = false;
+
+let endlessMode = false;
+let endlessCategorySpeciesCache = null;
 
 function getTodayKey() {
   const now = new Date();
@@ -203,6 +218,47 @@ function saveScore(dateKey, scoreData) {
   saveScores(scores);
 }
 
+function loadEndlessStats() {
+  try {
+    return JSON.parse(localStorage.getItem(ENDLESS_STATS_STORAGE_KEY)) || {
+      currentStreak: 0,
+      bestStreak: 0,
+      lastScoredPuzzleId: null,
+    };
+  } catch {
+    return {
+      currentStreak: 0,
+      bestStreak: 0,
+      lastScoredPuzzleId: null,
+    };
+  }
+}
+
+function saveEndlessStats(stats) {
+  localStorage.setItem(ENDLESS_STATS_STORAGE_KEY, JSON.stringify(stats));
+}
+
+function updateEndlessStats(scoreData) {
+  const stats = loadEndlessStats();
+
+  // Prevent replaying the same endless puzzle from changing the streak again.
+  if (stats.lastScoredPuzzleId === scoreData.date) {
+    return stats;
+  }
+
+  if (Number(scoreData.score) === 9) {
+    stats.currentStreak += 1;
+    stats.bestStreak = Math.max(stats.bestStreak, stats.currentStreak);
+  } else {
+    stats.currentStreak = 0;
+  }
+
+  stats.lastScoredPuzzleId = scoreData.date;
+  saveEndlessStats(stats);
+
+  return stats;
+}
+
 function parseDateKey(dateKey) {
   const year = Number(dateKey.slice(0, 4));
   const month = Number(dateKey.slice(4, 6)) - 1;
@@ -338,6 +394,22 @@ async function loadGameData() {
     throw new Error("Could not load species list.");
   }
 
+  const taxonomyResponse = await fetch("./data/taxonomy_lookup.json", {
+    cache: "no-store",
+  });
+
+  if (taxonomyResponse.ok) {
+    taxonomyLookup = await taxonomyResponse.json();
+  }
+
+  const ebirdImageResponse = await fetch("./data/ebird_image_lookup.json", {
+    cache: "no-store",
+  });
+
+  if (ebirdImageResponse.ok) {
+    ebirdImageLookup = await ebirdImageResponse.json();
+  }
+
   const traitsResponse = await fetch("./data/species_traits.json", {
     cache: "no-store",
   });
@@ -380,11 +452,50 @@ function normalizeSearch(value) {
     .replace(/[^a-z0-9]/g, "");
 }
 
-// Bird-code-ish matching:
-// Song Sparrow -> sosp
-// American Robin -> amro
-// Bald Eagle -> baea
-// Northern Cardinal -> noca
+function getPreferredTaxonomy() {
+  const savedTaxonomy = localStorage.getItem(TAXONOMY_STORAGE_KEY);
+
+  if (savedTaxonomy === "ebird" || savedTaxonomy === "avilist") {
+    return savedTaxonomy;
+  }
+
+  return "ebird";
+}
+
+function setPreferredTaxonomy(taxonomy) {
+  localStorage.setItem(TAXONOMY_STORAGE_KEY, taxonomy);
+}
+
+function normalizeCommonNameKey(value) {
+  return String(value).trim().toLowerCase();
+}
+
+function getScientificNameForGuess(commonName) {
+  const normalized = normalizeCommonNameKey(commonName);
+
+  return taxonomyLookup.nameToScientific[normalized] || null;
+}
+
+function getDisplayNameForScientific(scientificName) {
+  const record = taxonomyLookup.byScientific[scientificName];
+
+  if (!record) {
+    return null;
+  }
+
+  const taxonomy = getPreferredTaxonomy();
+
+  if (taxonomy === "ebird" && record.ebird_common_name) {
+    return record.ebird_common_name;
+  }
+
+  return record.avilist_common_name || record.ebird_common_name || scientificName;
+}
+
+function getDisplayNameForBirdRecord(bird) {
+  return getDisplayNameForScientific(bird.scientific_name) || bird.common_name;
+}
+
 function speciesCode(name) {
   const words = String(name)
     .toLowerCase()
@@ -421,6 +532,28 @@ function getBlockedSpecies(currentCellId) {
   return blocked;
 }
 
+function getSearchableSpeciesOptions() {
+  const options = [];
+
+  for (const [scientificName, record] of Object.entries(taxonomyLookup.byScientific)) {
+    const displayName = getDisplayNameForScientific(scientificName);
+
+    if (!displayName) {
+      continue;
+    }
+
+    const aliases = record.names || [displayName];
+
+    options.push({
+      displayName,
+      scientificName,
+      aliases,
+    });
+  }
+
+  return options;
+}
+
 function getSpeciesMatches(query, currentCellId, limit = 12) {
   const q = normalizeSearch(query);
   const blocked = getBlockedSpecies(currentCellId);
@@ -430,28 +563,48 @@ function getSpeciesMatches(query, currentCellId, limit = 12) {
     return [];
   }
 
-  for (const name of species) {
-    if (blocked.has(name)) {
+  const options =
+    Object.keys(taxonomyLookup.byScientific).length > 0
+      ? getSearchableSpeciesOptions()
+      : species.map((name) => ({
+          displayName: name,
+          scientificName: null,
+          aliases: [name],
+        }));
+
+  for (const option of options) {
+    if (blocked.has(option.displayName)) {
       continue;
     }
 
-    const normalizedName = normalizeSearch(name);
-    const code = speciesCode(name);
+    let bestScore = null;
 
-    let score = null;
+    for (const alias of option.aliases) {
+      const normalizedAlias = normalizeSearch(alias);
+      const code = speciesCode(alias);
 
-    if (code === q) {
-      score = 0;
-    } else if (code.startsWith(q)) {
-      score = 1;
-    } else if (normalizedName.startsWith(q)) {
-      score = 2;
-    } else if (normalizedName.includes(q)) {
-      score = 3;
+      let score = null;
+
+      if (code === q) {
+        score = 0;
+      } else if (code.startsWith(q)) {
+        score = 1;
+      } else if (normalizedAlias.startsWith(q)) {
+        score = 2;
+      } else if (normalizedAlias.includes(q)) {
+        score = 3;
+      }
+
+      if (score !== null && (bestScore === null || score < bestScore)) {
+        bestScore = score;
+      }
     }
 
-    if (score !== null) {
-      matches.push({ name, score });
+    if (bestScore !== null) {
+      matches.push({
+        name: option.displayName,
+        score: bestScore,
+      });
     }
   }
 
@@ -513,8 +666,18 @@ function isDuplicateGuess(currentCellId, commonName, guesses) {
     return false;
   }
 
+  const currentScientificName =
+    getScientificNameForGuess(commonName) || normalizeCommonNameKey(commonName);
+
   for (const [cellId, guess] of Object.entries(guesses)) {
-    if (cellId !== currentCellId && guess.trim() === commonName.trim()) {
+    if (cellId === currentCellId || !guess.trim()) {
+      continue;
+    }
+
+    const guessedScientificName =
+      getScientificNameForGuess(guess) || normalizeCommonNameKey(guess);
+
+    if (guessedScientificName === currentScientificName) {
       return true;
     }
   }
@@ -533,12 +696,16 @@ function isCorrect(rowCat, colCat, commonName, guesses = null) {
     return false;
   }
 
+  const guessedScientificName = getScientificNameForGuess(commonName);
   const key = `${rowCat} × ${colCat}`;
-  const validNames = new Set(
-    puzzle.cells[key].map((bird) => bird.common_name)
-  );
 
-  return validNames.has(commonName);
+  return puzzle.cells[key].some((bird) => {
+    if (guessedScientificName) {
+      return bird.scientific_name === guessedScientificName;
+    }
+
+    return bird.common_name === commonName;
+  });
 }
 
 function getScoreGrid(guesses) {
@@ -597,7 +764,7 @@ function buildShareText(scoreData) {
 }
 
 function buildResultTooltip(guess, rowCat, colCat) {
-  const speciesStatus = speciesTraits[guess];
+  const speciesStatus = getSpeciesStatusForGuess(guess);
 
   if (!speciesStatus) {
     return null;
@@ -624,7 +791,77 @@ function buildResultTooltip(guess, rowCat, colCat) {
   tooltip.appendChild(rowLine);
   tooltip.appendChild(colLine);
 
+  const hint = document.createElement("div");
+  hint.className = "tooltip-hint";
+  hint.textContent = "Click tile for more...";
+
+  tooltip.appendChild(hint);
+
   return tooltip;
+}
+
+function getSpeciesStatusForGuess(guess) {
+  if (speciesTraits[guess]) {
+    return speciesTraits[guess];
+  }
+
+  const scientificName = getScientificNameForGuess(guess);
+
+  if (!scientificName) {
+    return null;
+  }
+
+  const record = taxonomyLookup.byScientific[scientificName];
+
+  if (!record) {
+    return null;
+  }
+
+  if (record.avilist_common_name && speciesTraits[record.avilist_common_name]) {
+    return speciesTraits[record.avilist_common_name];
+  }
+
+  if (record.ebird_common_name && speciesTraits[record.ebird_common_name]) {
+    return speciesTraits[record.ebird_common_name];
+  }
+
+  return null;
+}
+
+function findBirdRecordForCell(rowCat, colCat, guess) {
+  const key = `${rowCat} × ${colCat}`;
+  const guessedScientificName = getScientificNameForGuess(guess);
+
+  if (!puzzle.cells[key]) {
+    return null;
+  }
+
+  return puzzle.cells[key].find((bird) => {
+    if (guessedScientificName) {
+      return bird.scientific_name === guessedScientificName;
+    }
+
+    return bird.common_name === guess;
+  }) || null;
+}
+
+function getTaxonomyRecordForBird(guess, birdRecord = null) {
+  const scientificName =
+    birdRecord?.scientific_name || getScientificNameForGuess(guess);
+
+  if (!scientificName) {
+    return null;
+  }
+
+  return taxonomyLookup.byScientific[scientificName] || null;
+}
+
+function getImageRecordForBird(taxonomyRecord) {
+  if (!taxonomyRecord || !taxonomyRecord.scientific_name) {
+    return null;
+  }
+
+  return ebirdImageLookup[taxonomyRecord.scientific_name] || null;
 }
 
 function getAveragePossibleAnswers() {
@@ -639,6 +876,70 @@ function getAveragePossibleAnswers() {
 
   const total = counts.reduce((sum, count) => sum + count, 0);
   return total / counts.length;
+}
+
+function getEndlessCategorySpecies() {
+  if (endlessCategorySpeciesCache) {
+    return endlessCategorySpeciesCache;
+  }
+
+  const categorySpecies = {};
+
+  for (const [commonName, traitMap] of Object.entries(speciesTraits)) {
+    const scientificName =
+      taxonomyLookup.byAviListCommon?.[commonName] ||
+      getScientificNameForGuess(commonName) ||
+      "";
+
+    const birdRecord = {
+      common_name: commonName,
+      scientific_name: scientificName,
+    };
+
+    for (const [category, status] of Object.entries(traitMap)) {
+      if (!status || !status.matches) {
+        continue;
+      }
+
+      if (!categorySpecies[category]) {
+        categorySpecies[category] = [];
+      }
+
+      categorySpecies[category].push(birdRecord);
+    }
+  }
+
+  endlessCategorySpeciesCache = categorySpecies;
+  return endlessCategorySpeciesCache;
+}
+
+function requiredEndlessSpeciesForCell(rowCat, colCat) {
+  if (
+    DIFFICULTY_EXCEPTION_CATEGORIES.has(rowCat) ||
+    DIFFICULTY_EXCEPTION_CATEGORIES.has(colCat)
+  ) {
+    return ENDLESS_MIN_SPECIES_PER_EXCEPTION_CELL;
+  }
+
+  return ENDLESS_MIN_SPECIES_PER_CELL;
+}
+
+function endlessCellSpecies(rowCat, colCat, categorySpecies) {
+  const rowSpecies = categorySpecies[rowCat] || [];
+  const colSpecies = categorySpecies[colCat] || [];
+
+  const colScientific = new Set(
+    colSpecies.map((bird) => bird.scientific_name || bird.common_name)
+  );
+
+  return rowSpecies.filter((bird) =>
+    colScientific.has(bird.scientific_name || bird.common_name)
+  );
+}
+
+function hasUniqueCategoryGroups(categories) {
+  const groups = categories.map((category) => getCategoryGroup(category));
+  return groups.length === new Set(groups).size;
 }
 
 function getDifficultyExceptionCount() {
@@ -671,8 +972,14 @@ function classifyDifficulty(difficultyScore) {
 function renderPuzzleMeta() {
   const sectionTitle = document.querySelector(".section-title");
 
-  if (!sectionTitle || document.getElementById("puzzle-meta")) {
+  if (!sectionTitle) {
     return;
+  }
+
+  const existing = document.getElementById("puzzle-meta");
+
+  if (existing) {
+    existing.remove();
   }
 
   const avgAnswers = getAveragePossibleAnswers();
@@ -702,6 +1009,12 @@ function renderPuzzleMeta() {
 }
 
 function renderLocalStats() {
+  document.getElementById("endless-stats")?.remove();
+
+  if (endlessMode) {
+    document.getElementById("local-stats")?.remove();
+    return;
+  }
   const existing = document.getElementById("local-stats");
 
   if (existing) {
@@ -728,6 +1041,39 @@ function renderLocalStats() {
     <span title="Current Streak"> Current Streak:  ${stats.currentStreak}</span>
     <span title="Best Streak"> Best Streak: ${stats.bestStreak}</span>
     <span title="Total Birdoku Completed">Played: ${stats.played}</span>
+  `;
+
+  insertAfter.insertAdjacentElement("afterend", statsEl);
+}
+
+function renderEndlessStats() {
+  const existing = document.getElementById("endless-stats");
+
+  if (existing) {
+    existing.remove();
+  }
+
+  if (!endlessMode) {
+    return;
+  }
+
+  const insertAfter =
+    document.getElementById("puzzle-meta") ||
+    document.querySelector(".section-title");
+
+  if (!insertAfter) {
+    return;
+  }
+
+  const stats = loadEndlessStats();
+
+  const statsEl = document.createElement("div");
+  statsEl.id = "endless-stats";
+  statsEl.className = "local-stats endless-stats";
+
+  statsEl.innerHTML = `
+    <span title="Current Endless Streak">Current Endless Streak: ${stats.currentStreak}</span>
+    <span title="Best Endless Streak">Best Endless Streak: ${stats.bestStreak}</span>
   `;
 
   insertAfter.insertAdjacentElement("afterend", statsEl);
@@ -783,7 +1129,7 @@ function renderArchiveNotice() {
     existing.remove();
   }
 
-  if (!archiveMode) {
+  if (!archiveMode && !endlessMode) {
     return;
   }
 
@@ -912,6 +1258,13 @@ function renderCompletedGame(scoreData) {
       const box = document.createElement("div");
       box.className = `result-box ${correct ? "correct-box" : "wrong-box"}`;
 
+      if (guess) {
+        box.title = "Click tile for more";
+        box.addEventListener("click", () => {
+          openBirdDetailModal(guess, row, col, correct);
+        });
+      }
+
       const label = document.createElement("div");
       label.className = "result-label";
       label.textContent = guess || "-";
@@ -935,25 +1288,49 @@ function renderCompletedGame(scoreData) {
   actions.innerHTML = "";
   actions.className = "actions";
 
-  const copyButton = document.createElement("button");
-  copyButton.textContent = "Share Results! 🔗";
-  copyButton.addEventListener("click", async () => {
-    const status = document.getElementById("copy-status");
+  if (endlessMode) {
+    actions.classList.add("endless-actions");
 
-    try {
-      await navigator.clipboard.writeText(scoreData.shareText);
-      status.textContent = "Results copied!";
-    } catch {
-      status.textContent = "Could not copy automatically. Please copy manually.";
-    }
-  });
+    const playAgainButton = document.createElement("button");
+    playAgainButton.textContent = "Play Again";
+    playAgainButton.addEventListener("click", () => {
+      document.getElementById("result").innerHTML = "";
+      renderPlayableGame();
+    });
 
-  actions.appendChild(copyButton);
+    const playAnotherButton = document.createElement("button");
+    playAnotherButton.textContent = "Play Another";
+    playAnotherButton.addEventListener("click", () => {
+      startEndlessMode(false);
+    });
+
+    actions.appendChild(playAgainButton);
+    actions.appendChild(playAnotherButton);
+  } else {
+    const copyButton = document.createElement("button");
+    copyButton.textContent = "Share Results! 🔗";
+    copyButton.addEventListener("click", async () => {
+      const status = document.getElementById("copy-status");
+
+      try {
+        await navigator.clipboard.writeText(scoreData.shareText);
+        status.textContent = "Results copied!";
+      } catch {
+        status.textContent = "Could not copy automatically. Please copy manually.";
+      }
+    });
+
+    actions.appendChild(copyButton);
+  }
+
+  const resultCaption = endlessMode
+    ? "Endless Mode puzzles do not affect your daily streak."
+    : "Thanks for playing today’s Birdoku!";
 
   result.innerHTML = `
     <div class="result-panel">
       <div class="success">Score: ${scoreData.score}/9</div>
-      <div class="caption">Thanks for playing today’s Birdoku!</div>
+      <div class="caption">${resultCaption}</div>
       <div id="copy-status" class="copy-status"></div>
     </div>
   `;
@@ -986,13 +1363,16 @@ function finalizeSubmitGame(guesses) {
     score,
     scoreGrid,
     guesses,
-    mode: archiveMode ? "archive" : "daily",
+    mode: endlessMode ? "endless" : archiveMode ? "archive" : "daily",
     submittedAt: new Date().toISOString(),
   };
 
   scoreData.shareText = buildShareText(scoreData);
 
-  if (!archiveMode) {
+  if (endlessMode) {
+    updateEndlessStats(scoreData);
+    renderEndlessStats();
+  } else if (!archiveMode) {
     saveScore(puzzle.date, scoreData);
     renderLocalStats();
   }
@@ -1035,6 +1415,167 @@ async function init() {
   }
 }
 
+function shuffleArray(values) {
+  const copy = [...values];
+
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+
+  return copy;
+}
+
+// Endless mode!
+
+function generateEndlessPuzzle() {
+  const categorySpecies = getEndlessCategorySpecies();
+
+  const usableCategories = Object.keys(categorySpecies).filter((category) => {
+    const count = categorySpecies[category].length;
+
+    return (
+      count >= ENDLESS_MIN_SPECIES_PER_CELL ||
+      DIFFICULTY_EXCEPTION_CATEGORIES.has(category)
+    );
+  });
+
+  for (let attempt = 0; attempt < ENDLESS_MAX_ATTEMPTS; attempt++) {
+    const chosen = shuffleArray(usableCategories).slice(0, 6);
+
+    if (!hasUniqueCategoryGroups(chosen)) {
+      continue;
+    }
+
+    const rowCats = chosen.slice(0, 3);
+    const colCats = chosen.slice(3);
+
+    const cells = {};
+    let valid = true;
+
+    for (const rowCat of rowCats) {
+      for (const colCat of colCats) {
+        const key = `${rowCat} × ${colCat}`;
+        const answers = endlessCellSpecies(rowCat, colCat, categorySpecies);
+        const required = requiredEndlessSpeciesForCell(rowCat, colCat);
+
+        if (answers.length < required) {
+          valid = false;
+          break;
+        }
+
+        cells[key] = answers.sort((a, b) =>
+          a.common_name.localeCompare(b.common_name)
+        );
+      }
+
+      if (!valid) {
+        break;
+      }
+    }
+
+    if (valid) {
+      return {
+        date: `endless-${Date.now()}`,
+        mode: "endless",
+        rows: rowCats,
+        cols: colCats,
+        cells,
+      };
+    }
+  }
+
+  throw new Error("Could not generate a new Birdoku puzzle. Something went wrong!");
+}
+
+function setSectionTitle(text) {
+  const sectionTitle = document.querySelector(".section-title");
+
+  if (sectionTitle) {
+    sectionTitle.textContent = text;
+  }
+}
+
+function updateEndlessButton() {
+  const button = document.getElementById("endless-button");
+
+  if (!button) {
+    return;
+  }
+
+  button.textContent = endlessMode ? "Daily" : "Endless";
+  button.setAttribute(
+    "aria-label",
+    endlessMode ? "Return to daily Birdoku" : "Play endless mode"
+  );
+}
+
+function clearModeNotices() {
+  document.getElementById("archive-notice")?.remove();
+  document.getElementById("endless-notice")?.remove();
+}
+
+function renderEndlessNotice() {
+  const existing = document.getElementById("endless-notice");
+
+  if (existing) {
+    existing.remove();
+  }
+
+  if (!endlessMode) {
+    return;
+  }
+
+  const insertAfter =
+    document.getElementById("endless-stats") ||
+    document.getElementById("puzzle-meta") ||
+    document.querySelector(".section-title");
+
+  if (!insertAfter) {
+    return;
+  }
+
+  const notice = document.createElement("div");
+  notice.id = "endless-notice";
+  notice.className = "endless-notice";
+  notice.innerHTML = `
+    <strong>Playing in Endless Mode.</strong>
+    Puzzles are randomly generated.
+  `;
+
+  insertAfter.insertAdjacentElement("afterend", notice);
+}
+
+function startEndlessMode(showWelcome = true) {
+  endlessMode = true;
+  archiveMode = false;
+
+  puzzle = generateEndlessPuzzle();
+  puzzleDateKey = puzzle.date;
+
+  setSectionTitle("Endless Mode");
+  updateEndlessButton();
+
+  document.getElementById("result").innerHTML = "";
+
+  renderPuzzleMeta();
+  renderEndlessStats();
+  renderEndlessNotice();
+
+  document.getElementById("local-stats")?.remove();
+  document.getElementById("archive-notice")?.remove();
+  document.getElementById("designer-credit")?.remove();
+
+  renderPlayableGame();
+
+  if (showWelcome) {
+    openEndlessWelcomeModal();
+  }
+}
+
+function returnToDailyMode() {
+  window.location.href = "./";
+}
 
 // How to Play popup stuff
 function openHowToPlay() {
@@ -1161,6 +1702,200 @@ function openIncompleteSubmitModal(onConfirm) {
   document.body.classList.add("modal-open");
 }
 
+function openBirdDetailModal(guess, rowCat, colCat, correct) {
+  const modal = document.getElementById("bird-detail-modal");
+  const content = document.getElementById("bird-detail-content");
+
+  if (!modal || !content || !guess) {
+    return;
+  }
+
+  const birdRecord = findBirdRecordForCell(rowCat, colCat, guess);
+  const taxonomyRecord = getTaxonomyRecordForBird(guess, birdRecord);
+  const imageRecord = getImageRecordForBird(taxonomyRecord);
+
+  const scientificName =
+    birdRecord?.scientific_name ||
+    taxonomyRecord?.scientific_name ||
+    "";
+
+  const displayName =
+    scientificName
+      ? getDisplayNameForScientific(scientificName) || guess
+      : guess;
+
+  const speciesStatus = getSpeciesStatusForGuess(guess);
+  const rowStatus = speciesStatus ? speciesStatus[rowCat] : null;
+  const colStatus = speciesStatus ? speciesStatus[colCat] : null;
+
+  content.innerHTML = "";
+
+  const header = document.createElement("div");
+  header.className = "bird-detail-header";
+
+  const title = document.createElement("h2");
+  title.id = "bird-detail-title";
+  title.className = "bird-detail-title";
+
+  if (taxonomyRecord && taxonomyRecord.ebird_url) {
+    const link = document.createElement("a");
+    link.href = taxonomyRecord.ebird_url;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.textContent = displayName;
+    title.appendChild(link);
+  } else {
+    title.textContent = displayName;
+  }
+
+  header.appendChild(title);
+
+  if (scientificName) {
+    const scientific = document.createElement("div");
+    scientific.className = "bird-detail-scientific";
+    scientific.textContent = scientificName;
+    header.appendChild(scientific);
+  }
+
+  content.appendChild(header);
+
+  const imageWrap = document.createElement("div");
+  imageWrap.className = "bird-detail-image-wrap";
+
+  const image = document.createElement("img");
+  image.className = "bird-detail-image";
+  image.src = imageRecord.image_url;
+  image.alt = displayName;
+  image.loading = "lazy";
+
+  imageWrap.appendChild(image);
+  content.appendChild(imageWrap);
+
+  const traits = document.createElement("div");
+  traits.className = "bird-detail-traits";
+
+  for (const status of [rowStatus, colStatus]) {
+    if (!status) {
+      continue;
+    }
+
+    const line = document.createElement("div");
+    line.className = `tooltip-pill ${status.matches ? "tooltip-good" : "tooltip-bad"}`;
+    line.textContent = status.label;
+    traits.appendChild(line);
+  }
+
+  if (!rowStatus && !colStatus) {
+    const fallback = document.createElement("p");
+    fallback.className = "bird-detail-fallback";
+    fallback.textContent = correct
+      ? "This bird is valid for this cell."
+      : "This bird is not valid for this cell.";
+    traits.appendChild(fallback);
+  }
+
+  content.appendChild(traits);
+
+  modal.classList.add("is-open");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+}
+
+function closeBirdDetailModal() {
+  const modal = document.getElementById("bird-detail-modal");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.remove("is-open");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+}
+
+function setupBirdDetailModal() {
+  const closeButton = document.getElementById("bird-detail-close");
+  const modal = document.getElementById("bird-detail-modal");
+
+  if (closeButton) {
+    closeButton.addEventListener("click", closeBirdDetailModal);
+  }
+
+  if (modal) {
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        closeBirdDetailModal();
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeBirdDetailModal();
+    }
+  });
+}
+
+function openEndlessWelcomeModal() {
+  const modal = document.getElementById("endless-welcome-modal");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.add("is-open");
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+}
+
+function closeEndlessWelcomeModal() {
+  const modal = document.getElementById("endless-welcome-modal");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.remove("is-open");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+}
+
+function setupEndlessMode() {
+  const button = document.getElementById("endless-button");
+  const closeButton = document.getElementById("endless-welcome-close");
+  const modal = document.getElementById("endless-welcome-modal");
+
+  if (button) {
+    button.addEventListener("click", () => {
+      if (endlessMode) {
+        returnToDailyMode();
+      } else {
+        startEndlessMode(true);
+      }
+    });
+  }
+
+  if (closeButton) {
+    closeButton.addEventListener("click", closeEndlessWelcomeModal);
+  }
+
+  if (modal) {
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        closeEndlessWelcomeModal();
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeEndlessWelcomeModal();
+    }
+  });
+
+  updateEndlessButton();
+}
+
 function getPreferredTheme() {
   const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
 
@@ -1204,14 +1939,76 @@ function toggleTheme() {
   applyTheme(nextTheme);
 }
 
-function setupThemeToggle() {
-  applyTheme(getPreferredTheme());
+function setupSettingsModal() {
+  const button = document.getElementById("settings-button");
+  const closeButton = document.getElementById("settings-close");
+  const modal = document.getElementById("settings-modal");
+  const themeSelect = document.getElementById("theme-setting");
+  const taxonomySelect = document.getElementById("taxonomy-setting");
 
-  const button = document.getElementById("theme-toggle-button");
+  function openSettingsModal() {
+    if (!modal) {
+      return;
+    }
+
+    if (themeSelect) {
+      themeSelect.value = getPreferredTheme();
+    }
+
+    if (taxonomySelect) {
+      taxonomySelect.value = getPreferredTaxonomy();
+    }
+
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+  }
+
+  function closeSettingsModal() {
+    if (!modal) {
+      return;
+    }
+
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+  }
 
   if (button) {
-    button.addEventListener("click", toggleTheme);
+    button.addEventListener("click", openSettingsModal);
   }
+
+  if (closeButton) {
+    closeButton.addEventListener("click", closeSettingsModal);
+  }
+
+  if (modal) {
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        closeSettingsModal();
+      }
+    });
+  }
+
+  if (themeSelect) {
+    themeSelect.addEventListener("change", () => {
+      localStorage.setItem(THEME_STORAGE_KEY, themeSelect.value);
+      applyTheme(themeSelect.value);
+    });
+  }
+
+  if (taxonomySelect) {
+    taxonomySelect.addEventListener("change", () => {
+      setPreferredTaxonomy(taxonomySelect.value);
+      location.reload();
+    });
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeSettingsModal();
+    }
+  });
 }
 
 // Archive mode dropdown stuff
@@ -1324,9 +2121,13 @@ document.addEventListener("keydown", (event) => {
 });
 
 setupHowToPlayModal();
-setupThemeToggle();
+applyTheme(getPreferredTheme());
+setupSettingsModal();
 setupArchiveDropdown();
+setupBirdDetailModal();
+setupEndlessMode();
 
 init().then(() => {
   openHowToPlayModal();
+  updateEndlessButton();
 });

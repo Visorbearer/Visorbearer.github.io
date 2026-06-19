@@ -38,8 +38,8 @@
   <main class="page">
     <header class="birdoku-header">
 
-      <button id="theme-toggle-button" class="theme-toggle-button" type="button" aria-label="Toggle light and dark mode">
-        🌙
+      <button id="settings-button" class="theme-toggle-button" type="button" aria-label="Settings">
+        ⚙️
       </button>
 
       <button id="how-to-play-button" class="help-button" type="button" aria-label="How to play">
@@ -52,6 +52,10 @@
         </button>
 
         <div id="archive-dropdown" class="archive-dropdown" aria-hidden="true"></div>
+
+        <button id="endless-button" class="endless-button" type="button" aria-label="Play endless mode">
+          Endless
+        </button>
       </div>
 
       <div class="birdoku-logo-placeholder">
@@ -112,12 +116,45 @@
       
       <p>
         Although donations to support maintenance of this project are appreciated, Birdoku is a free, 
-        non-commercial application. Any errors in gameplay categories may reflect either data limitations 
-        or developer implementation choices. This game is still in development and may contain bugs or 
-        incomplete features. Thanks for checking it out!
+        non-commercial application. Any errors in gameplay categories may reflect data limitations 
+        or developer implementation, but you are encourage to pass them along by emailing mwmaron2@illinois.edu. 
+      </p>
+
+      <p>
+        Thanks for playing Birdoku!
+      </p>
+
+      <p>
+        Current Version: 1.0
       </p>
     </footer>
   </main>
+
+  <div id="settings-modal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-card settings-modal-card" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <button id="settings-close" class="modal-close-button" type="button" aria-label="Close Settings">
+        ×
+      </button>
+
+      <h2 id="settings-title">Settings</h2>
+
+      <div class="settings-row">
+        <label for="theme-setting">Theme</label>
+        <select id="theme-setting">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+
+      <div class="settings-row">
+        <label for="taxonomy-setting">Default Taxonomy</label>
+        <select id="taxonomy-setting">
+          <option value="ebird">eBird</option>
+          <option value="avilist">AviList</option>
+        </select>
+      </div>
+    </div>
+  </div>
 
   <div id="how-to-play-modal" class="modal-backdrop" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="how-to-play-title">
@@ -172,6 +209,43 @@
           No, Go Back
         </button>
       </div>
+    </div>
+  </div>
+
+  <div id="endless-welcome-modal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="endless-welcome-title">
+     <button id="endless-welcome-close" class="modal-close-button" type="button" aria-label="Close Endless Mode Welcome">
+        ×
+      </button>
+
+      <h2 id="endless-welcome-title">Welcome to Endless Mode!</h2>
+
+      <p>
+        Here, you can continuously play randomly generated Birdoku puzzles to your heart's content.
+      </p>
+
+      <p>
+        Note that completing these puzzles will not affect your streak score.
+      </p>
+
+      <p>
+        After submitting your answers in Endless Mode, you can press the "Play Again" button to replay
+        the same puzzle or "Play Another" to play a different one.
+      </p>
+
+      <p>
+        If you'd like to go back to daily mode, click the "Daily" button in the header.
+      </p>
+    </div>
+  </div>
+
+  <div id="bird-detail-modal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-card bird-detail-card" role="dialog" aria-modal="true" aria-labelledby="bird-detail-title">
+      <button id="bird-detail-close" class="modal-close-button" type="button" aria-label="Close Bird Detail">
+        ×
+      </button>
+
+      <div id="bird-detail-content"></div>
     </div>
   </div>
 

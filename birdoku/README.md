@@ -17,10 +17,12 @@ birdoku/
 │
 ├── data/
 │   ├── BIRDBASE v2025.1 Sekercioglu et al. Final.xlsx       # The BIRDBASE dataset
-│   ├── category_reference.json                              # The category/subcat reference
+│   ├── category_reference.json                              # The category/subcat 
+│   ├── ebird_image_lookup.json                              # The lookup for eBird species page media
 │   ├── species_lookup.csv                                   # Source lookup of all possible common names
 │   ├── species_lookup.json                                  # Common-name lookup for autocomplete
 │   ├── species_traits.json                                  # Trait lookup for post-game hover tooltips
+│   ├── taxonomy_lookup.json                                 # The lookup for BIRDBASE-eBird taxonomy
 │   └── value_translator.csv                                 # BIRDBASE lookup for categories used in Birdoku
 │
 ├── answers/                                                 # Each day's answers
@@ -40,8 +42,10 @@ birdoku/
 ├── scripts/
 │   ├── pick_cats.py                                         # Generates the daily grid + valid answers
 │   ├── build_category_reference.py                          # Generates the category/subcat reference JSON
+|   ├── build_ebird_image_lookup.py                          # Builds the eBird embed image lookup JSON
 │   ├── build_static.py                                      # Converts generated files for the static site
 │   ├── build_species_traits.py                              # Builds tooltip trait data from BIRDBASE
+|   ├── build_taxonomy_lookup.py                             # Builds the BIRDBASE-eBird taxonomy lookup JSON
 │   └── play_game.py                                         # Old rudimentary local Streamlit version
 │
 ├── README.md                                                # This!
@@ -51,9 +55,9 @@ birdoku/
 
 ## Release Log
 
-**0.0.1.** Jun 17 2026. Initial release.
+**0.1.** Jun 17 2026. Initial release.
 
-**0.0.2.** Jun 17 2026. QOL updates for the UI!
+**0.2.** Jun 17 2026. QOL updates for the UI!
 - Added tooltips after submission to show user why their answer was incorrect. 
 - Added "how to play" button and pop-up. 
 - Added difficulty score and increased minimum number of species needed for an acceptable cell to 150.
@@ -61,13 +65,13 @@ birdoku/
 - Added a light/dark mode toggle button.
 - Improved mobile display of the Birdoku grid.
 
-**0.0.3.** Jun 17 2026. A few more gameplay updates.
+**0.3.** Jun 17 2026. A few more gameplay updates.
 - Added a local streak tracker.
 - Added a playable archive of past games that does not affect your streak stats.
 - Bug fixes.
 - Added a logo.
 
-**0.0.4.** Jun 19 2026. Improvements based on user feedback!
+**0.4.** Jun 19 2026. Improvements based on user feedback!
 - Changed streaks to be based on "wins" (9/9) instead of just playing.
 - Shifted the difficulty rating frame down and added penalties for special categories.
 - Added clickable/tappable categories to see all options within the category and updated How to Play accordingly.
@@ -75,16 +79,19 @@ birdoku/
 - Added a warning popup if the user tries to submit an incomplete Birdoku.
 - Added a script to allow for the creation of custom daily games and relevant updates in other scripts.
 
+**1.0.** Jun 19 2026. The first "finished" release! Finished in my opinion, anyway.
+- Added [eBird taxonomy (2025 v4)](https://www.birds.cornell.edu/clementschecklist/introduction/updateindex/october-2025/2025-citation-checklist-downloads/) as the default.
+- Added a settings button and modal, with the dark/light mode toggle and taxonomy options inside.
+- Added popup boxes on click/tap of answers which show eBird species page media embeds and a link to the eBird page in both eBird and AviList taxonomy modes.
+- Added an endless mode, including its own streak scores!
+
 ## Future Improvements
 
 These are the things I'd like to add or update in the future to improve the game. I'll be removing them as they are accomplished.
 
 - Allow players to log in and save stats
 - Score rarity for each correct bird after submitting based on eBird observation count
-- Set images/illustrations to appear in the boxes after the answer is submitted
-- Add an "endless mode" which endlessly generates new sets for users to play, though they don't affect score (but maybe can add an "endless mode streak" of how many endless mode games you've gotten 9/9 on in a row)
-- Add scientific name-based translator from current AviList common names to eBird common names
-- Add a randomly-chosen "bird of the day" which is guaranteed to fit in the puzzle and, if it used in the puzzle that day, give an extra score point or something depending on how stats/points work long term-- also make the bird of the day link to the ebird page for it
+- Add a randomly-chosen "bird of the day" based on the species that fits into the most tiles of the puzzle and if it is used after pressing submit, add "Today's Bird of the Day Found!" under the scientific name in bold on the click popup
 
 ## Contact
 
