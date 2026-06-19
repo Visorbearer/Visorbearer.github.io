@@ -61,6 +61,8 @@ birdoku/
 - Bug fixes.
 - Added a logo.
 
+**0.0.4.** Jun 19 2026. Changed streaks to be based on "wins" (9/9) instead of just playing and shifted difficulty rating frame down.
+
 ## Future Improvements
 
 These are the things I'd like to add or update in the future to improve the game. I'll be removing them as they are accomplished.

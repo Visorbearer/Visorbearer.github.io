@@ -143,9 +143,22 @@ function addDays(date, days) {
   return next;
 }
 
+function isPerfectScore(scoreData) {
+  return scoreData && Number(scoreData.score) === 9;
+}
+
 function getCompletedDateKeys() {
   return Object.keys(loadScores())
     .filter((dateKey) => /^\d{8}$/.test(dateKey))
+    .sort();
+}
+
+function getPerfectDateKeys() {
+  const scores = loadScores();
+
+  return Object.keys(scores)
+    .filter((dateKey) => /^\d{8}$/.test(dateKey))
+    .filter((dateKey) => isPerfectScore(scores[dateKey]))
     .sort();
 }
 
@@ -158,7 +171,7 @@ function calculateCurrentStreak(todayKey) {
   while (true) {
     const cursorKey = dateKeyFromDate(cursor);
 
-    if (!scores[cursorKey]) {
+    if (!isPerfectScore(scores[cursorKey])) {
       break;
     }
 
@@ -170,22 +183,20 @@ function calculateCurrentStreak(todayKey) {
 }
 
 function calculateBestStreak() {
-  const completedKeys = getCompletedDateKeys();
+  const perfectKeys = getPerfectDateKeys();
 
-  if (completedKeys.length === 0) {
+  if (perfectKeys.length === 0) {
     return 0;
   }
 
   let best = 1;
   let current = 1;
 
-  for (let i = 1; i < completedKeys.length; i++) {
-    const previousDate = parseDateKey(completedKeys[i - 1]);
-    const currentDate = parseDateKey(completedKeys[i]);
-
+  for (let i = 1; i < perfectKeys.length; i++) {
+    const previousDate = parseDateKey(perfectKeys[i - 1]);
     const expectedNextKey = dateKeyFromDate(addDays(previousDate, 1));
 
-    if (completedKeys[i] === expectedNextKey) {
+    if (perfectKeys[i] === expectedNextKey) {
       current += 1;
     } else {
       current = 1;
@@ -541,11 +552,11 @@ function getAveragePossibleAnswers() {
 }
 
 function classifyDifficulty(avgAnswers) {
-  if (avgAnswers >= 750) {
+  if (avgAnswers >= 800) {
     return "Easy";
   }
 
-  if (avgAnswers >= 250) {
+  if (avgAnswers >= 400) {
     return "Medium";
   }
 
