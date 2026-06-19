@@ -1,6 +1,16 @@
 const STORAGE_KEY = "birdoku_scores_v1";
 const THEME_STORAGE_KEY = "birdoku_theme";
 
+const DIFFICULTY_EXCEPTION_CATEGORIES = new Set([
+  "Volancy: Flightless",
+  "Nest Parasitism: Nest Parasite",
+  "IUCN Red List Status: Extinct",
+  "Location: Madagascar & Surrounding Islands",
+  "Social Behavior: Lekking",
+  "Movement: Non-Migratory",
+  "Nest Substrate: Cactus",
+]);
+
 let puzzle = null;
 let species = [];
 let speciesTraits = {};
@@ -551,16 +561,27 @@ function getAveragePossibleAnswers() {
   return total / counts.length;
 }
 
-function classifyDifficulty(avgAnswers) {
-  if (avgAnswers >= 800) {
+function getDifficultyExceptionCount() {
+  return [...puzzle.rows, ...puzzle.cols].filter((category) =>
+    DIFFICULTY_EXCEPTION_CATEGORIES.has(category)
+  ).length;
+}
+
+function getDifficultyScore(avgAnswers, exceptionCount) {
+  const exceptionPenalty = 175;
+  return avgAnswers - exceptionCount * exceptionPenalty;
+}
+
+function classifyDifficulty(difficultyScore) {
+  if (difficultyScore >= 800) {
     return "Easy";
   }
 
-  if (avgAnswers >= 400) {
+  if (difficultyScore >= 400) {
     return "Medium";
   }
 
-  if (avgAnswers >= 100) {
+  if (difficultyScore >= 100) {
     return "Hard";
   }
 
@@ -575,12 +596,17 @@ function renderPuzzleMeta() {
   }
 
   const avgAnswers = getAveragePossibleAnswers();
-  const difficulty = classifyDifficulty(avgAnswers);
+  const exceptionCount = getDifficultyExceptionCount();
+  const difficultyScore = getDifficultyScore(avgAnswers, exceptionCount);
+  const difficulty = classifyDifficulty(difficultyScore);
 
   const meta = document.createElement("div");
   meta.id = "puzzle-meta";
   meta.className = "puzzle-meta";
-  meta.title = `Average possible answers per cell: ${avgAnswers.toFixed(1)}`;
+  meta.title =
+    `Average possible answers per cell: ${avgAnswers.toFixed(1)}. ` +
+    `Exception categories: ${exceptionCount}. ` +
+    `Difficulty score: ${difficultyScore.toFixed(1)}.`;
 
   const label = document.createElement("span");
   label.textContent = "Difficulty: ";
