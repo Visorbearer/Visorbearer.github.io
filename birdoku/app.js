@@ -14,6 +14,7 @@ const DIFFICULTY_EXCEPTION_CATEGORIES = new Set([
 let puzzle = null;
 let species = [];
 let speciesTraits = {};
+let categoryReference = {};
 let puzzleDateKey = null;
 let archiveMode = false;
 
@@ -98,6 +99,77 @@ function formatCategoryLabel(label) {
       <strong>${escapeHtml(shortCategoryName(first))}:</strong> ${addPreferredBreaks(rest)}
     </span>
   `;
+}
+
+function closeCategoryInfoPopovers() {
+  document.querySelectorAll(".category-info-popover").forEach((popover) => {
+    popover.classList.remove("is-open");
+    popover.setAttribute("aria-hidden", "true");
+  });
+}
+
+function getCategoryGroup(label) {
+  if (!label.includes(":")) {
+    return label.trim();
+  }
+
+  return label.split(":")[0].trim();
+}
+
+function buildCategoryInfoPopover(categoryLabel) {
+  const group = getCategoryGroup(categoryLabel);
+  const values = categoryReference[group] || [];
+
+  if (values.length === 0) {
+    return null;
+  }
+
+  const popover = document.createElement("div");
+  popover.className = "category-info-popover";
+  popover.setAttribute("aria-hidden", "true");
+
+  const title = document.createElement("div");
+  title.className = "category-info-title";
+  title.textContent = `${group} options`;
+
+  const list = document.createElement("ul");
+  list.className = "category-info-list";
+
+  for (const value of values) {
+    const item = document.createElement("li");
+    item.textContent = value;
+    list.appendChild(item);
+  }
+
+  popover.appendChild(title);
+  popover.appendChild(list);
+
+  return popover;
+}
+
+function makeCategoryHeaderClickable(header, categoryLabel) {
+  const popover = buildCategoryInfoPopover(categoryLabel);
+
+  if (!popover) {
+    return;
+  }
+
+  header.classList.add("clickable-category");
+  header.title = "Click to see other options in this category";
+  header.appendChild(popover);
+
+  header.addEventListener("click", (event) => {
+    event.stopPropagation();
+
+    const alreadyOpen = popover.classList.contains("is-open");
+
+    closeCategoryInfoPopovers();
+
+    if (!alreadyOpen) {
+      popover.classList.add("is-open");
+      popover.setAttribute("aria-hidden", "false");
+    }
+  });
 }
 
 function escapeHtml(value) {
@@ -272,6 +344,14 @@ async function loadGameData() {
 
   if (!traitsResponse.ok) {
     throw new Error("Could not load species traits.");
+  }
+
+  const categoryReferenceResponse = await fetch("./data/category_reference.json", {
+    cache: "no-store",
+  });
+
+  if (categoryReferenceResponse.ok) {
+    categoryReference = await categoryReferenceResponse.json();
   }
 
   puzzle = await puzzleResponse.json();
@@ -705,6 +785,7 @@ function renderPlayableGame() {
     const colHeader = document.createElement("div");
     colHeader.className = "cat-box";
     colHeader.innerHTML = formatCategoryLabel(col);
+    makeCategoryHeaderClickable(colHeader, col);
     grid.appendChild(colHeader);
   }
 
@@ -715,7 +796,7 @@ function renderPlayableGame() {
     rowHeader.className = "cat-box row-cat-box";
     rowHeader.innerHTML = formatCategoryLabel(row);
     grid.appendChild(rowHeader);
-
+    makeCategoryHeaderClickable(rowHeader, row);
     for (let colIndex = 0; colIndex < puzzle.cols.length; colIndex++) {
       const col = puzzle.cols[colIndex];
       const cellId = `${row} × ${col}`;
@@ -769,6 +850,7 @@ function renderCompletedGame(scoreData) {
     const colHeader = document.createElement("div");
     colHeader.className = "cat-box";
     colHeader.innerHTML = formatCategoryLabel(col);
+    makeCategoryHeaderClickable(colHeader, col);
     grid.appendChild(colHeader);
   }
 
@@ -776,6 +858,7 @@ function renderCompletedGame(scoreData) {
     const rowHeader = document.createElement("div");
     rowHeader.className = "cat-box row-cat-box";
     rowHeader.innerHTML = formatCategoryLabel(row);
+    makeCategoryHeaderClickable(rowHeader, row);
     grid.appendChild(rowHeader);
 
     for (const col of puzzle.cols) {
@@ -1125,6 +1208,14 @@ function setupArchiveDropdown() {
     }
   });
 }
+
+document.addEventListener("click", closeCategoryInfoPopovers);
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeCategoryInfoPopovers();
+  }
+});
 
 setupHowToPlayModal();
 setupThemeToggle();

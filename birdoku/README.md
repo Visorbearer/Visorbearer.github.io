@@ -17,6 +17,7 @@ birdoku/
 │
 ├── data/
 │   ├── BIRDBASE v2025.1 Sekercioglu et al. Final.xlsx       # The BIRDBASE dataset
+│   ├── category_reference.json                              # The category/subcat reference
 │   ├── species_lookup.csv                                   # Source lookup of all possible common names
 │   ├── species_lookup.json                                  # Common-name lookup for autocomplete
 │   ├── species_traits.json                                  # Trait lookup for post-game hover tooltips
@@ -32,8 +33,13 @@ birdoku/
 │   ├── 20260617.json
 │   └── ...
 │
+├── assets/  
+│   ├── CERW_large.png  
+│   └── CERW_small.png
+│
 ├── scripts/
 │   ├── pick_cats.py                                         # Generates the daily grid + valid answers
+│   ├── build_category_reference.py                          # Generates the category/subcat reference JSON
 │   ├── build_static.py                                      # Converts generated files for the static site
 │   ├── build_species_traits.py                              # Builds tooltip trait data from BIRDBASE
 │   └── play_game.py                                         # Old rudimentary local Streamlit version
@@ -61,7 +67,11 @@ birdoku/
 - Bug fixes.
 - Added a logo.
 
-**0.0.4.** Jun 19 2026. Changed streaks to be based on "wins" (9/9) instead of just playing and shifted difficulty rating frame down.
+**0.0.4.** Jun 19 2026. Improvements based on user feedback!
+- Changed streaks to be based on "wins" (9/9) instead of just playing.
+- Shifted difficulty rating frame down.
+- Added clickable/tappable categories to see all options within the category and updated How to Play accordingly.
+- Embedded the README/Changelog into the webpage.
 
 ## Future Improvements
 

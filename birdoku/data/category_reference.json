@@ -1,0 +1,106 @@
+{
+  "Diet": [
+    "Fish",
+    "Fruit",
+    "Invertebrates",
+    "Land Vertebrates",
+    "Nectar",
+    "Scavenger",
+    "Seeds, Nuts, or Grain",
+    "Vegetation"
+  ],
+  "Habitat": [
+    "Artificial/Anthropogenic",
+    "Bamboo",
+    "Desert",
+    "Dry & Open Areas",
+    "Forest",
+    "Grasslands, Tundra, or Open Vegetation",
+    "Open Sea/Pelagic",
+    "Riparian or Riverine",
+    "Rocky Areas",
+    "Savanna or Plains",
+    "Sea Coast or Estuaries",
+    "Shrub/Scrubland",
+    "Wetlands, Lakes, or Marsh",
+    "Woodland"
+  ],
+  "IUCN Red List Status": [
+    "Critically Endangered",
+    "Endangered",
+    "Extinct",
+    "Extinct in the Wild",
+    "Least Concern",
+    "Near-threatened",
+    "Possibly Extinct",
+    "Possibly Extinct in the Wild",
+    "Vulnerable"
+  ],
+  "Location": [
+    "Afrotropical",
+    "Australian",
+    "Cosmopolitan",
+    "Eastern Hemisphere",
+    "Global Range <50k km2",
+    "Indomalayan",
+    "Island-Restricted",
+    "Madagascar & Surrounding Islands",
+    "Nearctic",
+    "Neotropical",
+    "New Zealand & Surrounding Islands",
+    "Oceania",
+    "Palearctic",
+    "South Polar",
+    "Temperate",
+    "Temperate-Polar",
+    "Tropical",
+    "Tropical-Polar",
+    "Tropical-Temperate"
+  ],
+  "Movement": [
+    "Non-Migratory"
+  ],
+  "Nest Parasitism": [
+    "Nest Parasite"
+  ],
+  "Nest Substrate": [
+    "Bamboo",
+    "Building",
+    "Cactus",
+    "Grass",
+    "Ground",
+    "Pole",
+    "Rock",
+    "Shrub, Bush, or Vine",
+    "Stump",
+    "Tree",
+    "Water"
+  ],
+  "Nest Type": [
+    "Burrow",
+    "Cavity",
+    "Crevice",
+    "Cup/Bowl",
+    "Dome/Oven",
+    "Half-cup/Shallow Cup",
+    "Mound",
+    "No Nest",
+    "Other Bird's Nest",
+    "Pendant/Bag",
+    "Platform",
+    "Saucer",
+    "Scrape",
+    "Sphere/Globular"
+  ],
+  "Social Behavior": [
+    "Colonial",
+    "Lekking",
+    "Pairs and Family Groups",
+    "Single or in Pairs",
+    "Social",
+    "Solitary"
+  ],
+  "Volancy": [
+    "Flightless"
+  ]
+}
