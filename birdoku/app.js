@@ -1079,6 +1079,34 @@ function renderEndlessStats() {
   insertAfter.insertAdjacentElement("afterend", statsEl);
 }
 
+function regenerateEndlessPuzzle() {
+  if (!endlessMode) {
+    return;
+  }
+
+  startEndlessMode(false);
+}
+
+function hasAnyGuesses() {
+  return Object.values(getCurrentGuesses()).some((guess) => guess.trim());
+}
+
+function regenerateEndlessPuzzle() {
+  if (!endlessMode) {
+    return;
+  }
+
+  if (hasAnyGuesses()) {
+    const ok = window.confirm("Regenerate this endless puzzle? Your current guesses will be lost.");
+
+    if (!ok) {
+      return;
+    }
+  }
+
+  startEndlessMode(false);
+}
+
 function renderDesignerCredit() {
   const existing = document.getElementById("designer-credit");
 
@@ -1221,6 +1249,32 @@ function renderPlayableGame() {
   submitButton.textContent = "Submit";
   submitButton.addEventListener("click", submitGame);
   actions.appendChild(submitButton);
+
+  if (endlessMode) {
+    actions.classList.add("endless-actions");
+
+    const regenerateButton = document.createElement("button");
+    regenerateButton.type = "button";
+    regenerateButton.className = "regenerate-button";
+    regenerateButton.title = "Generate a different Birdoku puzzle";
+    regenerateButton.setAttribute("aria-label", "Generate a different Birdoku puzzle");
+
+    const icon = document.createElement("img");
+    icon.src = "./assets/redo.png";
+    icon.alt = "";
+    icon.className = "regenerate-icon";
+    icon.setAttribute("aria-hidden", "true");
+
+    const label = document.createElement("span");
+    label.textContent = "Regenerate";
+
+    regenerateButton.appendChild(icon);
+    regenerateButton.appendChild(label);
+
+    regenerateButton.addEventListener("click", regenerateEndlessPuzzle);
+
+    actions.appendChild(regenerateButton);
+  }
 }
 
 function renderCompletedGame(scoreData) {

@@ -874,6 +874,26 @@ html[data-theme="dark"] .birdoku-title {
   min-width: 240px;
 }
 
+.regenerate-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background-color: var(--blue-button);
+  color: white;
+}
+
+.regenerate-button:hover {
+  background-color: var(--blue-button-hover);
+}
+
+.regenerate-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
 /* Designer credit for custom games */
 
 .designer-credit {
@@ -1294,6 +1314,11 @@ html[data-theme="dark"] .birdoku-title {
   .endless-actions > button {
     width: 100%;
     max-width: 260px;
+  }
+
+  .regenerate-icon {
+    width: 22px;
+    height: 22px;
   }
 
   .category-info-popover {

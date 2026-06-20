@@ -7925,9 +7925,8 @@
     "ebird_common_name": "Long-tailed Sylph",
     "species_code": "lotsyl1",
     "ebird_url": "https://ebird.org/species/lotsyl1",
-    "image_url": "",
-    "page_title": "",
-    "error": "HTTPSConnectionPool(host='secure.birds.cornell.edu', port=443): Read timed out. (read timeout=20)"
+    "image_url": "https://cdn.download.ams.birds.cornell.edu/api/v2/asset/56650121/900",
+    "page_title": "Long-tailed Sylph - eBird"
   },
   "Aglaiocercus coelestis": {
     "scientific_name": "Aglaiocercus coelestis",
@@ -10914,9 +10913,8 @@
     "ebird_common_name": "Malagasy Coucal",
     "species_code": "madcou1",
     "ebird_url": "https://ebird.org/species/madcou1",
-    "image_url": "",
-    "page_title": "",
-    "error": "[Errno 13] Permission denied: 'C:\\\\Users\\\\mmaro\\\\OneDrive\\\\Documents\\\\GitHub\\\\Visorbearer.github.io\\\\birdoku\\\\data\\\\ebird_image_lookup.json'"
+    "image_url": "https://cdn.download.ams.birds.cornell.edu/api/v2/asset/211705651/900",
+    "page_title": "Malagasy Coucal - eBird"
   },
   "Centropus goliath": {
     "scientific_name": "Centropus goliath",
