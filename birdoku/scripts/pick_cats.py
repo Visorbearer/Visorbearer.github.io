@@ -18,8 +18,8 @@ ROOT = Path(__file__).resolve().parent.parent
 BIRDBASE_PATH = ROOT / "data" / "BIRDBASE v2025.1 Sekercioglu et al. Final.xlsx"
 TRANSLATOR_PATH = ROOT / "data" / "value_translator.csv"
 
-MIN_SPECIES_PER_CELL = 150
-MIN_SPECIES_PER_EXCEPTION_CELL = 10
+MIN_SPECIES_PER_CELL = 180
+MIN_SPECIES_PER_EXCEPTION_CELL = 50
 N_ROWS = 3
 N_COLS = 3
 
