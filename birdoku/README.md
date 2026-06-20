@@ -37,7 +37,8 @@ birdoku/
 │
 ├── assets/  
 │   ├── CERW_large.png  
-│   └── CERW_small.png
+│   ├── CERW_small.png
+│   └── redo.png
 │
 ├── scripts/
 │   ├── pick_cats.py                                         # Generates the daily grid + valid answers
@@ -55,9 +56,9 @@ birdoku/
 
 ## Release Log
 
-**0.1.** Jun 17 2026. Initial release.
+**0.1.** *Jun 17 2026*. Initial release.
 
-**0.2.** Jun 17 2026. QOL updates for the UI!
+**0.2.** *Jun 17 2026*. QOL updates for the UI!
 - Added tooltips after submission to show user why their answer was incorrect. 
 - Added "how to play" button and pop-up. 
 - Added difficulty score and increased minimum number of species needed for an acceptable cell to 150.
@@ -65,13 +66,13 @@ birdoku/
 - Added a light/dark mode toggle button.
 - Improved mobile display of the Birdoku grid.
 
-**0.3.** Jun 17 2026. A few more gameplay updates.
+**0.3.** *Jun 17 2026*. A few more gameplay updates.
 - Added a local streak tracker.
 - Added a playable archive of past games that does not affect your streak stats.
 - Bug fixes.
 - Added a logo.
 
-**0.4.** Jun 19 2026. Improvements based on user feedback!
+**0.4.** *Jun 19 2026*. Improvements based on user feedback!
 - Changed streaks to be based on "wins" (9/9) instead of just playing.
 - Shifted the difficulty rating frame down and added penalties for special categories.
 - Added clickable/tappable categories to see all options within the category and updated How to Play accordingly.
@@ -79,7 +80,7 @@ birdoku/
 - Added a warning popup if the user tries to submit an incomplete Birdoku.
 - Added a script to allow for the creation of custom daily games and relevant updates in other scripts.
 
-**1.0.** Jun 19 2026. The first "finished" release! Finished in my opinion, anyway.
+**1.0.** *Jun 19 2026*. The first "finished" release! Finished in my opinion, anyway.
 - Added [eBird taxonomy (2025 v4)](https://www.birds.cornell.edu/clementschecklist/introduction/updateindex/october-2025/2025-citation-checklist-downloads/) as the default.
 - Added a settings button and modal, with the dark/light mode toggle and taxonomy options inside.
 - Added popup boxes on click/tap of answers which show eBird species page media embeds and a link to the eBird page in both eBird and AviList taxonomy modes.
