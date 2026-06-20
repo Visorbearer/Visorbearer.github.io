@@ -86,6 +86,9 @@ birdoku/
 - Added popup boxes on click/tap of answers which show eBird species page media embeds and a link to the eBird page in both eBird and AviList taxonomy modes.
 - Added an endless mode, including its own streak scores!
 
+*1.1.** *Jun 20 2026*. A minor update.
+- Added possible correct species in the tap/click modal when the user gets the answer wrong.
+
 ## Future Improvements
 
 These are the things I'd like to add or update in the future to improve the game. I'll be removing them as they are accomplished.

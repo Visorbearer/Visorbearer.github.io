@@ -999,6 +999,30 @@ html[data-theme="dark"] .birdoku-title {
   font-weight: 900;
 }
 
+.possible-answers-block {
+  margin-top: 8px;
+  padding: 12px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: var(--soft-gray);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.possible-answers-title {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.possible-answers-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
 .result-box {
   cursor: pointer;
 }

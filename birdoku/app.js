@@ -1390,6 +1390,33 @@ function renderCompletedGame(scoreData) {
   `;
 }
 
+function getRandomItems(values, count) {
+  const copy = [...values];
+
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+
+  return copy.slice(0, count);
+}
+
+function getPossibleAnswerExamples(rowCat, colCat, submittedGuess, count = 3) {
+  const key = `${rowCat} × ${colCat}`;
+  const answers = puzzle.cells[key] || [];
+  const submittedScientificName = getScientificNameForGuess(submittedGuess);
+
+  const filtered = answers.filter((bird) => {
+    if (submittedScientificName) {
+      return bird.scientific_name !== submittedScientificName;
+    }
+
+    return bird.common_name !== submittedGuess;
+  });
+
+  return getRandomItems(filtered, count);
+}
+
 function submitGame() {
   closeSuggestions();
 
@@ -1846,6 +1873,32 @@ function openBirdDetailModal(guess, rowCat, colCat, correct) {
       ? "This bird is valid for this cell."
       : "This bird is not valid for this cell.";
     traits.appendChild(fallback);
+  }
+
+  if (!correct) {
+    const examples = getPossibleAnswerExamples(rowCat, colCat, guess, 3);
+
+    if (examples.length > 0) {
+      const examplesBlock = document.createElement("div");
+      examplesBlock.className = "possible-answers-block";
+
+      const examplesTitle = document.createElement("div");
+      examplesTitle.className = "possible-answers-title";
+      examplesTitle.textContent = "Possible Answers Include:";
+
+      const examplesList = document.createElement("ul");
+      examplesList.className = "possible-answers-list";
+
+      for (const bird of examples) {
+        const item = document.createElement("li");
+        item.textContent = getDisplayNameForBirdRecord(bird);
+        examplesList.appendChild(item);
+      }
+
+      examplesBlock.appendChild(examplesTitle);
+      examplesBlock.appendChild(examplesList);
+      traits.appendChild(examplesBlock);
+    }
   }
 
   content.appendChild(traits);
