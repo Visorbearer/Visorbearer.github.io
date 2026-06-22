@@ -71,6 +71,11 @@ value_translator = pd.concat(
     ignore_index=True,
 )
 
+value_translator = value_translator.drop_duplicates(
+    subset=["pretty_name"],
+    keep="last",
+).reset_index(drop=True)
+
 IUCN_LABELS = {
     "EX": "Extinct",
     "EW": "Extinct in the Wild",
@@ -93,8 +98,30 @@ def split_allowed_values(value):
 def truthy_series(series):
     return (
         series.notna()
-        & ~series.astype(str).str.strip().isin(["", "0", "0.0", "False", "false", "nan", "NaN"])
+        & ~series.astype(str).str.strip().isin(
+            ["", "0", "0.0", "False", "false", "nan", "NaN"]
+        )
     )
+
+
+def values_match_allowed(raw_values, allowed_values):
+    """
+    Compare raw BirdBase values to translator values.
+
+    Handles cases where source data may read numeric values as 1.0
+    while value_translator stores them as 1.
+    """
+
+    raw_values = raw_values.fillna("").astype(str).str.strip()
+
+    raw_values_numeric = pd.to_numeric(raw_values, errors="coerce")
+    allowed_values_numeric = pd.to_numeric(pd.Series(allowed_values), errors="coerce")
+
+    if allowed_values_numeric.notna().all():
+        return raw_values_numeric.isin(allowed_values_numeric)
+
+    return raw_values.isin(allowed_values)
+
 
 def expanded_category_rows(row):
     category = str(row["category"]).strip()
@@ -108,6 +135,10 @@ def expanded_category_rows(row):
     # 3 Temperate
     # 4 Temperate-Polar
     # 5 Tropical-Polar
+    #
+    # Gameplay interpretation:
+    # Tropical accepts Tropical, Tropical-Temperate, Tropical-Polar.
+    # Temperate accepts Tropical-Temperate, Temperate, Temperate-Polar.
     if not already_expanded and category == "Location" and subcat == "LAT":
         if value_user == "Tropical":
             expanded = row.copy()
@@ -121,7 +152,8 @@ def expanded_category_rows(row):
             expanded["_expanded"] = True
             return [expanded]
 
-    # For gameplay, count Single or in Pairs as acceptable for Solitary.
+    # Gameplay interpretation:
+    # Count Single or in Pairs as acceptable for Solitary.
     if not already_expanded and category == "Social Behavior" and value_user == "Solitary":
         row_single_or_pairs = row.copy()
         row_single_or_pairs["subcategory_code"] = "Social_4"
@@ -136,6 +168,7 @@ def expanded_category_rows(row):
         return [row_single_or_pairs, row_solitary]
 
     return [row]
+
 
 def species_for_category(row):
     expanded_rows = expanded_category_rows(row)
@@ -195,12 +228,14 @@ def species_for_category(row):
     allowed_values = split_allowed_values(value)
     raw_values = birds[subcat].fillna("").astype(str).str.strip()
 
+    # Realm values can be combinations.
+    # Example: AZNP should match A, Z, N, and P.
     if subcat == "RLM":
         matches = raw_values.apply(
             lambda raw: any(code in raw for code in allowed_values)
         )
     else:
-        matches = raw_values.isin(allowed_values)
+        matches = values_match_allowed(raw_values, allowed_values)
 
     return set(birds.loc[matches, "species_id"])
 
@@ -228,6 +263,9 @@ label_categories = {
     "Nest Substrate",
     "Habitat",
     "Diet",
+    "Movement",
+    "Volancy",
+    "Nest Parasitism",
 }
 
 for category in label_categories:
@@ -296,8 +334,10 @@ def raw_value_to_user_label(category, subcat, raw_value):
         if subcat == "RLM":
             if any(code in raw_value for code in allowed_values):
                 labels.append(label)
-        elif raw_value in allowed_values:
-            labels.append(label)
+        else:
+            raw_series = pd.Series([raw_value])
+            if values_match_allowed(raw_series, allowed_values).iloc[0]:
+                labels.append(label)
 
     if labels:
         return ", ".join(dict.fromkeys(labels))
@@ -315,6 +355,38 @@ def get_bird_row(species_id):
         row = row.iloc[0]
 
     return row
+
+
+def species_has_known_group(species_id, category):
+    """
+    Used by autocomplete to suppress birds with unknown data only when
+    a cell depends on that data group.
+
+    Example:
+      If a cell has Social Behavior, suppress birds with no known Social Behavior.
+      If a cell has Nest Type, suppress birds with no known Nest Type.
+      If a cell has Nest Substrate, suppress birds with no known Nest Substrate.
+    """
+
+    group_rows = value_translator[
+        value_translator["category"].astype(str).str.strip() == str(category).strip()
+    ]
+
+    for _, row in group_rows.iterrows():
+        pretty = row["pretty_name"]
+
+        if species_id in category_species.get(pretty, set()):
+            return True
+
+    return False
+
+
+def known_groups_for_species(species_id):
+    return {
+        "Social Behavior": species_has_known_group(species_id, "Social Behavior"),
+        "Nest Type": species_has_known_group(species_id, "Nest Type"),
+        "Nest Substrate": species_has_known_group(species_id, "Nest Substrate"),
+    }
 
 
 def actual_label_for_species(species_id, translator_row):
@@ -393,6 +465,8 @@ for i, (_, bird) in enumerate(valid_birds.iterrows(), start=1):
     common_name = str(bird["common_name"])
 
     traits[common_name] = {}
+
+    traits[common_name]["_known_groups"] = known_groups_for_species(species_id)
 
     for _, translator_row in value_translator.iterrows():
         pretty = translator_row["pretty_name"]

@@ -86,8 +86,13 @@ birdoku/
 - Added popup boxes on click/tap of answers which show eBird species page media embeds and a link to the eBird page in both eBird and AviList taxonomy modes.
 - Added an endless mode, including its own streak scores!
 
-*1.1.** *Jun 20 2026*. A minor update.
+**1.1.** *Jun 20 2026*. A minor update.
 - Added possible correct species in the tap/click modal when the user gets the answer wrong.
+
+**1.2.** *Jun 22 2026*. For the best.
+- Removed species with "unknown" for social or nest site/substrate from the pool, so they can no longer
+be selected from the list and are not considered in the puzzle's answer set.
+- Added a "bird of the day" bonus bit of fun!
 
 ## Future Improvements
 
@@ -95,7 +100,6 @@ These are the things I'd like to add or update in the future to improve the game
 
 - Allow players to log in and save stats
 - Score rarity for each correct bird after submitting based on eBird observation count
-- Add a randomly-chosen "bird of the day" based on the species that fits into the most tiles of the puzzle and if it is used after pressing submit, add "Today's Bird of the Day Found!" under the scientific name in bold on the click popup
 
 ## Contact
 

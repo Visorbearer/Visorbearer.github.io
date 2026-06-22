@@ -33,6 +33,9 @@ let archiveMode = false;
 let endlessMode = false;
 let endlessCategorySpeciesCache = null;
 
+let userBirdOfDay = null;
+let birdOfDayRevealed = false;
+
 function getTodayKey() {
   const now = new Date();
 
@@ -452,6 +455,65 @@ function normalizeSearch(value) {
     .replace(/[^a-z0-9]/g, "");
 }
 
+function getTraitGroupForCategory(categoryLabel) {
+  return getCategoryGroup(categoryLabel);
+}
+
+function getSpeciesTraitsForDisplayName(displayName) {
+  if (speciesTraits[displayName]) {
+    return speciesTraits[displayName];
+  }
+
+  const scientificName = getScientificNameForGuess(displayName);
+
+  if (!scientificName) {
+    return null;
+  }
+
+  const record = taxonomyLookup.byScientific[scientificName];
+
+  if (!record) {
+    return null;
+  }
+
+  if (record.avilist_common_name && speciesTraits[record.avilist_common_name]) {
+    return speciesTraits[record.avilist_common_name];
+  }
+
+  if (record.ebird_common_name && speciesTraits[record.ebird_common_name]) {
+    return speciesTraits[record.ebird_common_name];
+  }
+
+  return null;
+}
+
+function speciesHasKnownNeededGroups(displayName, cellId) {
+  const traits = getSpeciesTraitsForDisplayName(displayName);
+
+  if (!traits || !traits._known_groups) {
+    return true;
+  }
+
+  const [rowCat, colCat] = cellId.split(" × ");
+  const groups = [
+    getTraitGroupForCategory(rowCat),
+    getTraitGroupForCategory(colCat),
+  ];
+
+  for (const group of groups) {
+    if (
+      (group === "Social Behavior" ||
+        group === "Nest Type" ||
+        group === "Nest Substrate") &&
+      traits._known_groups[group] === false
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function getPreferredTaxonomy() {
   const savedTaxonomy = localStorage.getItem(TAXONOMY_STORAGE_KEY);
 
@@ -574,6 +636,10 @@ function getSpeciesMatches(query, currentCellId, limit = 12) {
 
   for (const option of options) {
     if (blocked.has(option.displayName)) {
+      continue;
+    }
+
+    if (!speciesHasKnownNeededGroups(option.displayName, currentCellId)) {
       continue;
     }
 
@@ -742,6 +808,141 @@ function getCorrectCount(guesses) {
   }
 
   return correctCount;
+}
+
+function getBirdKeyForRecord(bird) {
+  return bird.scientific_name || bird.common_name;
+}
+
+function getBirdOfDay() {
+  const counts = new Map();
+  const records = new Map();
+
+  for (const rowCat of puzzle.rows) {
+    for (const colCat of puzzle.cols) {
+      const key = `${rowCat} × ${colCat}`;
+      const answers = puzzle.cells[key] || [];
+
+      for (const bird of answers) {
+        const birdKey = getBirdKeyForRecord(bird);
+
+        counts.set(birdKey, (counts.get(birdKey) || 0) + 1);
+        records.set(birdKey, bird);
+      }
+    }
+  }
+
+  const candidates = [...records.values()];
+
+  candidates.sort((a, b) => {
+    const aKey = getBirdKeyForRecord(a);
+    const bKey = getBirdKeyForRecord(b);
+
+    const countDiff = (counts.get(bKey) || 0) - (counts.get(aKey) || 0);
+
+    if (countDiff !== 0) {
+      return countDiff;
+    }
+
+    const aName = getDisplayNameForBirdRecord(a);
+    const bName = getDisplayNameForBirdRecord(b);
+
+    return aName.localeCompare(bName);
+  });
+
+  const bird = candidates[0] || null;
+
+  if (!bird) {
+    return null;
+  }
+
+  const taxonomyRecord =
+    taxonomyLookup.byScientific[bird.scientific_name] || null;
+
+  const imageRecord = taxonomyRecord
+    ? getImageRecordForBird(taxonomyRecord)
+    : null;
+
+  return {
+    common_name: getDisplayNameForBirdRecord(bird),
+    scientific_name: bird.scientific_name,
+    original_common_name: bird.common_name,
+    cell_count: counts.get(getBirdKeyForRecord(bird)) || 0,
+    ebird_url: taxonomyRecord?.ebird_url || "",
+    image_url: imageRecord?.image_url || "",
+  };
+}
+
+function setUserBirdOfDay() {
+  userBirdOfDay = getBirdOfDay();
+}
+
+function guessesIncludeBirdOfDay(guesses) {
+  if (!userBirdOfDay) {
+    return false;
+  }
+
+  for (const guess of Object.values(guesses)) {
+    if (!guess.trim()) {
+      continue;
+    }
+
+    const guessedScientificName = getScientificNameForGuess(guess);
+
+    if (
+      guessedScientificName &&
+      guessedScientificName === userBirdOfDay.scientific_name
+    ) {
+      return true;
+    }
+
+    if (
+      normalizeCommonNameKey(guess) ===
+      normalizeCommonNameKey(userBirdOfDay.common_name)
+    ) {
+      return true;
+    }
+
+    if (
+      normalizeCommonNameKey(guess) ===
+      normalizeCommonNameKey(userBirdOfDay.original_common_name)
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function buildBirdOfDayFoundBlock() {
+  if (!userBirdOfDay) {
+    return "";
+  }
+
+  const nameHtml = userBirdOfDay.ebird_url
+    ? `<a href="${escapeHtml(userBirdOfDay.ebird_url)}" target="_blank" rel="noopener">${escapeHtml(userBirdOfDay.common_name)}</a>`
+    : escapeHtml(userBirdOfDay.common_name);
+
+  const imageHtml = userBirdOfDay.image_url
+    ? `
+      <div class="bird-of-day-image-wrap">
+        <img
+          class="bird-of-day-image"
+          src="${escapeHtml(userBirdOfDay.image_url)}"
+          alt="${escapeHtml(userBirdOfDay.common_name)}"
+          loading="lazy"
+        >
+      </div>
+    `
+    : "";
+
+  return `
+    <div id="bird-of-day-found" class="bird-of-day-found">
+      <strong>You found today's Bird of the Day, ${nameHtml}!</strong>
+      <div class="bird-of-day-scientific">${escapeHtml(userBirdOfDay.scientific_name)}</div>
+      ${imageHtml}
+    </div>
+  `;
 }
 
 function buildShareText(scoreData) {
@@ -1079,14 +1280,6 @@ function renderEndlessStats() {
   insertAfter.insertAdjacentElement("afterend", statsEl);
 }
 
-function regenerateEndlessPuzzle() {
-  if (!endlessMode) {
-    return;
-  }
-
-  startEndlessMode(false);
-}
-
 function hasAnyGuesses() {
   return Object.values(getCurrentGuesses()).some((guess) => guess.trim());
 }
@@ -1381,13 +1574,102 @@ function renderCompletedGame(scoreData) {
     ? "Endless Mode puzzles do not affect your daily streak."
     : "Thanks for playing today’s Birdoku!";
 
+  const birdOfDayFound =
+  !archiveMode &&
+  !endlessMode &&
+  guessesIncludeBirdOfDay(scoreData.guesses);
+
+  const birdOfDayHtml = birdOfDayFound
+  ? buildBirdOfDayFoundBlock()
+  : "";
+
   result.innerHTML = `
     <div class="result-panel">
       <div class="success">Score: ${scoreData.score}/9</div>
       <div class="caption">${resultCaption}</div>
+      ${birdOfDayHtml}
       <div id="copy-status" class="copy-status"></div>
     </div>
   `;
+}
+
+const BIRD_OF_DAY_KONAMI_SEQUENCE = [
+  "ArrowUp",
+  "ArrowUp",
+  "ArrowDown",
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowLeft",
+  "ArrowRight",
+  "b",
+  "a",
+  "Enter",
+];
+
+let birdOfDayKonamiIndex = 0;
+
+function revealBirdOfDay() {
+  if (!userBirdOfDay || archiveMode || endlessMode) {
+    return;
+  }
+
+  if (birdOfDayRevealed) {
+    return;
+  }
+
+  birdOfDayRevealed = true;
+
+  const existing = document.getElementById("bird-of-day-reveal");
+
+  if (existing) {
+    existing.remove();
+  }
+
+  const insertAfter =
+    document.getElementById("puzzle-meta") ||
+    document.querySelector(".section-title");
+
+  if (!insertAfter) {
+    return;
+  }
+
+  const reveal = document.createElement("div");
+  reveal.id = "bird-of-day-reveal";
+  reveal.className = "bird-of-day-reveal";
+
+  const linkHtml = userBirdOfDay.ebird_url
+    ? `<a href="${escapeHtml(userBirdOfDay.ebird_url)}" target="_blank" rel="noopener">${escapeHtml(userBirdOfDay.common_name)}</a>`
+    : escapeHtml(userBirdOfDay.common_name);
+
+  reveal.innerHTML = `
+    <strong>Bird of the Day:</strong> ${linkHtml}
+    <div class="bird-of-day-scientific">${escapeHtml(userBirdOfDay.scientific_name)}</div>
+  `;
+
+  insertAfter.insertAdjacentElement("afterend", reveal);
+}
+
+function setupBirdOfDayKonamiCode() {
+  document.addEventListener("keydown", (event) => {
+    const expectedKey = BIRD_OF_DAY_KONAMI_SEQUENCE[birdOfDayKonamiIndex];
+
+    const pressedKey =
+      event.key.length === 1 ? event.key.toLowerCase() : event.key;
+
+    if (pressedKey === expectedKey) {
+      birdOfDayKonamiIndex += 1;
+
+      if (birdOfDayKonamiIndex === BIRD_OF_DAY_KONAMI_SEQUENCE.length) {
+        birdOfDayKonamiIndex = 0;
+        revealBirdOfDay();
+      }
+
+      return;
+    }
+
+    birdOfDayKonamiIndex = pressedKey === BIRD_OF_DAY_KONAMI_SEQUENCE[0] ? 1 : 0;
+  });
 }
 
 function getRandomItems(values, count) {
@@ -1466,6 +1748,8 @@ async function init() {
 
   try {
     await loadGameData();
+
+    setUserBirdOfDay();
 
     loading.style.display = "none";
 
@@ -2232,6 +2516,7 @@ applyTheme(getPreferredTheme());
 setupSettingsModal();
 setupArchiveDropdown();
 setupBirdDetailModal();
+setupBirdOfDayKonamiCode();
 setupEndlessMode();
 
 init().then(() => {
