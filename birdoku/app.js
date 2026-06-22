@@ -1131,7 +1131,7 @@ function renderDesignerCredit() {
   credit.className = "designer-credit";
 
   const label = document.createElement("span");
-  label.textContent = "Today's Birdoku Designed by: ";
+  label.textContent = "Today's Birdoku designed by: ";
   credit.appendChild(label);
 
   if (puzzle.designer_url) {
