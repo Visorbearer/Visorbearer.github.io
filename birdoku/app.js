@@ -850,7 +850,14 @@ function getBirdOfDay() {
     return aName.localeCompare(bName);
   });
 
-  const bird = candidates[0] || null;
+  const maxCount = Math.max(...candidates.map((bird) => counts.get(getBirdKeyForRecord(bird)) || 0));
+  const topCandidates = candidates.filter(
+    (bird) => (counts.get(getBirdKeyForRecord(bird)) || 0) === maxCount
+  );
+
+  // Pick bird of day based on position in the top "tied" birds using the day * the month of the puzzle (+1 since Jan is 0)
+  const birdNoDay = (parseDateKey(puzzleDateKey).getDate() * (parseDateKey(puzzleDateKey).getMonth() + 1)) % topCandidates.length;
+  const bird = topCandidates[birdNoDay] || null;
 
   if (!bird) {
     return null;
