@@ -104,6 +104,10 @@ School for Field Studies Chile, Puerto Natales, Magallanes, Chile.
 
 ### Poster
 
+**2026** __Maron, M. W.__ and Van Doren, B. M. Integrating Localized Flight Call 
+Detections and Radar-derived Trajectories to Study Nocturnal Avian Migration. 
+International Radar Aeroecology Conference, Amsterdam, Netherlands.
+
 **2025** __Maron, M. W.__, Greig, E. I., & Boersma, J. Climate and Landscape
 Modification Drive Range Expansion in Lesser Goldfinch across the
 Pacific Northwest. Washington Chapter of the Wildlife Society Meeting,
