@@ -11,6 +11,9 @@ const DIFFICULTY_EXCEPTION_CATEGORIES = new Set([
   "Social Behavior: Lekking",
   "Movement: Non-Migratory",
   "Nest Substrate: Cactus",
+  "Social Behavior: Solitary",
+  "Social Behavior: Single or in Pairs",
+  "Social Behavior: Pairs and Family Groups",
 ]);
 
 const ENDLESS_MIN_SPECIES_PER_CELL = 150;
@@ -783,8 +786,18 @@ function getScoreGrid(guesses) {
     for (const col of puzzle.cols) {
       const cellId = `${row} × ${col}`;
       const guess = guesses[cellId] || "";
+      const correct = isCorrect(row, col, guess, guesses);
 
-      line += isCorrect(row, col, guess, guesses) ? "🟩" : "🟥";
+      if (
+        !archiveMode &&
+        !endlessMode &&
+        correct &&
+        isBirdOfDayGuess(guess)
+      ) {
+        line += "❇️";
+      } else {
+        line += correct ? "🟩" : "🟥";
+      }
     }
 
     lines.push(line);
@@ -884,41 +897,28 @@ function setUserBirdOfDay() {
   userBirdOfDay = getBirdOfDay();
 }
 
-function guessesIncludeBirdOfDay(guesses) {
-  if (!userBirdOfDay) {
+function isBirdOfDayGuess(guess) {
+  if (!userBirdOfDay || !guess || !guess.trim()) {
     return false;
   }
 
-  for (const guess of Object.values(guesses)) {
-    if (!guess.trim()) {
-      continue;
-    }
+  const guessedScientificName = getScientificNameForGuess(guess);
 
-    const guessedScientificName = getScientificNameForGuess(guess);
-
-    if (
-      guessedScientificName &&
-      guessedScientificName === userBirdOfDay.scientific_name
-    ) {
-      return true;
-    }
-
-    if (
-      normalizeCommonNameKey(guess) ===
-      normalizeCommonNameKey(userBirdOfDay.common_name)
-    ) {
-      return true;
-    }
-
-    if (
-      normalizeCommonNameKey(guess) ===
-      normalizeCommonNameKey(userBirdOfDay.original_common_name)
-    ) {
-      return true;
-    }
+  if (
+    guessedScientificName &&
+    guessedScientificName === userBirdOfDay.scientific_name
+  ) {
+    return true;
   }
 
-  return false;
+  return (
+    normalizeCommonNameKey(guess) === normalizeCommonNameKey(userBirdOfDay.common_name) ||
+    normalizeCommonNameKey(guess) === normalizeCommonNameKey(userBirdOfDay.original_common_name)
+  );
+}
+
+function guessesIncludeBirdOfDay(guesses) {
+  return Object.values(guesses).some((guess) => isBirdOfDayGuess(guess));
 }
 
 function buildBirdOfDayFoundBlock() {
@@ -958,6 +958,11 @@ function buildShareText(scoreData) {
       ? `Birdoku Archive ${scoreData.displayDate}`
       : `Birdoku ${scoreData.displayDate}`;
 
+  const birdOfDayLine =
+    scoreData.birdOfDayFound
+      ? `\n❇️ Bird of the Day Found!`
+      : "";
+
   const playUrl =
     scoreData.mode === "archive"
       ? `https://masonmaron.com/birdoku/?date=${scoreData.date}`
@@ -965,7 +970,8 @@ function buildShareText(scoreData) {
 
   return (
     `${title}\n` +
-    `Score: ${scoreData.score}/9\n\n` +
+    `Score: ${scoreData.score}/9` +
+    `${birdOfDayLine}\n\n` +
     `${scoreData.scoreGrid}\n\n` +
     `Play: ${playUrl}`
   );
@@ -1586,6 +1592,10 @@ function renderCompletedGame(scoreData) {
   !endlessMode &&
   guessesIncludeBirdOfDay(scoreData.guesses);
 
+  scoreData.birdOfDayFound = birdOfDayFound;
+  scoreData.scoreGrid = getScoreGrid(scoreData.guesses);
+  scoreData.shareText = buildShareText(scoreData);
+
   const birdOfDayHtml = birdOfDayFound
   ? buildBirdOfDayFoundBlock()
   : "";
@@ -1726,6 +1736,10 @@ function finalizeSubmitGame(guesses) {
   const score = getCorrectCount(guesses);
   const scoreGrid = getScoreGrid(guesses);
   const displayDate = displayDateFromKey(puzzle.date);
+  const birdOfDayFound =
+    !archiveMode &&
+    !endlessMode &&
+    guessesIncludeBirdOfDay(guesses);
 
   const scoreData = {
     date: puzzle.date,
@@ -1734,6 +1748,7 @@ function finalizeSubmitGame(guesses) {
     scoreGrid,
     guesses,
     mode: endlessMode ? "endless" : archiveMode ? "archive" : "daily",
+    birdOfDayFound,
     submittedAt: new Date().toISOString(),
   };
 
@@ -1800,6 +1815,29 @@ function shuffleArray(values) {
 
 // Endless mode!
 
+function hasAllowedCategoryGroupMix(categories) {
+  const counts = new Map();
+
+  for (const category of categories) {
+    const group = getCategoryGroup(category);
+    counts.set(group, (counts.get(group) || 0) + 1);
+  }
+
+  let repeatedGroups = 0;
+
+  for (const count of counts.values()) {
+    if (count > 2) {
+      return false;
+    }
+
+    if (count > 1) {
+      repeatedGroups += 1;
+    }
+  }
+
+  return repeatedGroups <= 1;
+}
+
 function generateEndlessPuzzle() {
   const categorySpecies = getEndlessCategorySpecies();
 
@@ -1815,7 +1853,7 @@ function generateEndlessPuzzle() {
   for (let attempt = 0; attempt < ENDLESS_MAX_ATTEMPTS; attempt++) {
     const chosen = shuffleArray(usableCategories).slice(0, 6);
 
-    if (!hasUniqueCategoryGroups(chosen)) {
+    if (!hasAllowedCategoryGroupMix(chosen)) {
       continue;
     }
 

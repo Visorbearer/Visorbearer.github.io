@@ -71,6 +71,17 @@ def truthy_series(series):
         )
     )
 
+def values_match_allowed(raw_values, allowed_values):
+
+    raw_values = raw_values.fillna("").astype(str).str.strip()
+
+    raw_values_numeric = pd.to_numeric(raw_values, errors="coerce")
+    allowed_values_numeric = pd.to_numeric(pd.Series(allowed_values), errors="coerce")
+
+    if allowed_values_numeric.notna().all():
+        return raw_values_numeric.isin(allowed_values_numeric)
+
+    return raw_values.isin(allowed_values)
 
 def expanded_category_rows(row):
     category = str(row["category"]).strip()
@@ -253,7 +264,7 @@ def species_for_category(row, birds, nest_details):
             lambda raw: any(code in raw for code in allowed_values)
         )
     else:
-        matches = raw_values.isin(allowed_values)
+        matches = values_match_allowed(birds[subcat], allowed_values)
 
     return set(birds.loc[matches, "species_id"])
 

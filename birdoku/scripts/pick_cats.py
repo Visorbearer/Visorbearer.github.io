@@ -183,6 +183,18 @@ def expanded_category_rows(row):
 
     return [row]
 
+def values_match_allowed(raw_values, allowed_values):
+
+    raw_values = raw_values.fillna("").astype(str).str.strip()
+
+    raw_values_numeric = pd.to_numeric(raw_values, errors="coerce")
+    allowed_values_numeric = pd.to_numeric(pd.Series(allowed_values), errors="coerce")
+
+    if allowed_values_numeric.notna().all():
+        return raw_values_numeric.isin(allowed_values_numeric)
+
+    return raw_values.isin(allowed_values)
+
 def species_for_category(row, birds, nest_details):
     """
     Given one row from value_translator, return the set of species_ids
@@ -272,7 +284,15 @@ def species_for_category(row, birds, nest_details):
             return set()
 
         allowed_values = [v.strip() for v in value.split("|")]
-        matches = birds[col].astype(str).str.strip().isin(allowed_values)
+        raw_values = birds[col].fillna("").astype(str).str.strip()
+
+        if subcat == "RLM":
+            matches = raw_values.apply(
+                lambda raw: any(code in raw for code in allowed_values)
+            )
+        else:
+            matches = values_match_allowed(birds[col], allowed_values)
+
         return set(birds.loc[matches, "species_id"])
 
 
@@ -315,9 +335,24 @@ def grid_is_valid(row_cats, col_cats):
 
 # Want to make sure cateogries don't end up duplicated like habitat x habitat
 # cause that's not as fun
-def has_unique_groups(chosen):
+# ...except in some cases where it still allows for a lot of species
+# cause variety is the spice of life
+from collections import Counter
+
+def has_allowed_group_mix(chosen):
     groups = [pretty_to_group[c] for c in chosen]
-    return len(groups) == len(set(groups))
+    counts = Counter(groups)
+
+    repeated_groups = [
+        group
+        for group, count in counts.items()
+        if count > 1
+    ]
+
+    if any(count > 2 for count in counts.values()):
+        return False
+
+    return len(repeated_groups) <= 1
 
 
 def generate_grid(max_attempts=10000):
@@ -326,7 +361,7 @@ def generate_grid(max_attempts=10000):
     for attempt in range(max_attempts):
         chosen = random.sample(category_names, N_ROWS + N_COLS)
 
-        if not has_unique_groups(chosen):
+        if not has_allowed_group_mix(chosen):
             continue
 
         row_cats = chosen[:N_ROWS]

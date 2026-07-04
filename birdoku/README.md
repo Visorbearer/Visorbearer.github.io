@@ -94,6 +94,13 @@ birdoku/
 be selected from the list and are not considered in the puzzle's answer set.
 - Added a "bird of the day" bonus bit of fun!
 
+**1.3.** *Jul 4 2026*. Hard to work with all these fireworks...
+- Added some social categories to the difficulty scoring metric.
+- Made getting the Bird of the Day show up in the copied results.
+- Allowed for some cross-category boards in the puzzle generator.
+- Fixed a bug that prevented movement categories from showing up in the puzzle.
+
+
 ## Future Improvements
 
 These are the things I'd like to add or update in the future to improve the game. I'll be removing them as they are accomplished.
