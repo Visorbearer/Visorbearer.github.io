@@ -6,7 +6,7 @@ Master's Student, University of Illinois Urbana-Champaign\
 
 ---
 
-**2025-Present** M.S., Natural Resources and Environmental Sciences, College
+**2025-Present** Ph.D., Natural Resources and Environmental Sciences, College
 of Agricultural, Consumer and Environmental Sciences, University of
 Illinois Urbana-Champaign
 
@@ -54,7 +54,7 @@ Diseases 60(4): 991-995. DOI: [10.7589/JWD-D-24-00013](https://doi.org/10.7589/J
 
 **2026** NRES Knoebel International Travel Grant (*$500*)
 
-**2026**  American Ornithological Society Travel Grant (*$700*)
+**2026** American Ornithological Society Travel Grant (*$700*)
 
 **2026** NSF Graduate Research Fellow (*$159,000*)
 
@@ -104,6 +104,15 @@ School for Field Studies Chile, Puerto Natales, Magallanes, Chile.
 
 ### Poster
 
+**2026** __Maron, M. W.__ and Van Doren, B. M. Radar Analysis of Fine-Scale Spatial
+Organization and Movement in Nocturnal Migration. American Ornithological Society
+Conference, Amherst, Massachusetts.
+
+**2026** Dhruv, T., __Maron, M. W.__, Corcoran, A., and Van Doren, B. M. 
+Three-dimensional thermal video tracking reveals light-induced behavioral
+disruptions in nocturnal migrants. American Ornithological Society Conference, 
+Amherst, Massachusetts.
+
 **2026** __Maron, M. W.__ and Van Doren, B. M. Integrating Localized Flight Call 
 Detections and Radar-derived Trajectories to Study Nocturnal Avian Migration. 
 International Radar Aeroecology Conference, Amsterdam, Netherlands.
@@ -143,6 +152,9 @@ chapter tops ‘BioBlitz’ Challenge, *Washington State University CAHNRS News*
 wildlife, *King 5 News Seattle*
 
 ### Authored Articles
+
+**2026** What's New with North American Birds, *North American*
+*Birds (American Birding Association)*
 
 **2024** A Bug’s Life Under Rough-legged Hawk Feathers, *Washington*
 *Ornithological Society Newsletter Issue 203*
