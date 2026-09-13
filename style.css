@@ -199,6 +199,32 @@ nav a.active {
   transform: scale(1.2);
 }
 
+.logo-strip {
+  max-width: 800px;
+  margin: 3rem auto 1rem;
+  padding: 2rem 1rem 0;
+  border-top: 1px solid #e5e5e5;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.75rem 2.5rem;
+}
+
+.logo-strip img {
+  max-width: 150px;
+  max-height: 72px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  opacity: 0.9;
+}
+
+.logo-strip img:hover {
+  opacity: 1;
+}
+
 @media (max-width: 768px) {
   .easter-egg {
     position: static;
@@ -255,3 +281,12 @@ a:hover {
   text-decoration: underline;
 }
 
+.logo-strip {
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+.logo-strip img {
+  max-width: 120px;
+  max-height: 58px;
+}

@@ -100,6 +100,8 @@ be selected from the list and are not considered in the puzzle's answer set.
 - Allowed for some cross-category boards in the puzzle generator.
 - Fixed a bug that prevented movement categories from showing up in the puzzle.
 
+**1.3.1** *Sept 12 2026*. Is this thing on?
+- Paused new puzzle creation, as I am not sure anyone is even playing these...
 
 ## Future Improvements
 
