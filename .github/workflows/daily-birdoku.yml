@@ -1,11 +1,12 @@
 name: Daily Birdoku Puzzle
 
 on:
-  schedule:
+  # schedule:
     # Runs at 05:01 UTC daily.
     # This is 12:01 AM EST / 1:01 AM EDT.
     # It generates tomorrow's puzzle so the next puzzle is ready before the date changes.
-    - cron: "1 5 * * *"
+  #  - cron: "1 5 * * *"
+  # Paused this cause I don't think anyone is playing tbh
   workflow_dispatch:
 
 permissions:
